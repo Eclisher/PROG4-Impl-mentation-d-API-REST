@@ -98,4 +98,35 @@ public class AccountRepository {
         return accounts;
     }
 
+    public Account findById(Long accountId) {
+        String query = "SELECT * FROM Account WHERE accountId = ?";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setLong(1, accountId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Account account = new Account();
+                account.setAccountID(resultSet.getInt("accountid"));
+                account.setAccountNumber(resultSet.getString("accountnumber"));
+                account.setClientLastName(resultSet.getString("clientlastname"));
+                account.setClientFirstName(resultSet.getString("clientfirstname"));
+                account.setPassword(resultSet.getString("password"));
+                account.setClientDateOfBirth(resultSet.getDate("clientdateofbirth"));
+                account.setMonthlyNetSalary(resultSet.getBigDecimal("monthlynetsalary"));
+                account.setCreationDate(resultSet.getTimestamp("creationdate"));
+                account.setModificationDate(resultSet.getTimestamp("modificationdate"));
+                account.setOverdraftEnabled(resultSet.getBoolean("overdraftenabled"));
+                account.setOverdraftLimit(resultSet.getBigDecimal("overdraftlimit"));
+                account.setInterestRateInitial(resultSet.getBigDecimal("interestrateinitial"));
+                account.setInterestRateSubsequent(resultSet.getBigDecimal("interestratesubsequent"));
+                account.setMaxOverdraftDays(resultSet.getInt("maxoverdraftdays"));
+                return account;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }

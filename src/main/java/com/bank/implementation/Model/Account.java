@@ -5,6 +5,18 @@ import java.util.Date;
 
 
 public class Account {
+    private String clientFirstName;
+    private String password;
+    private Date clientDateOfBirth;
+    private BigDecimal monthlyNetSalary;
+    private BigDecimal balance;
+    private Date creationDate;
+    private Date modificationDate;
+    private boolean overdraftEnabled;
+    private BigDecimal overdraftLimit;
+    private BigDecimal interestRateInitial;
+    private BigDecimal interestRateSubsequent;
+    private int maxOverdraftDays;
     public void setAccountID(int accountID) {
         this.accountID = accountID;
     }
@@ -80,6 +92,7 @@ public class Account {
         this.interestRateInitial = interestRateInitial;
         this.interestRateSubsequent = interestRateSubsequent;
         this.maxOverdraftDays = maxOverdraftDays;
+        this.balance = balance;
     }
 
     public int getAccountID() {
@@ -138,15 +151,11 @@ public class Account {
         return maxOverdraftDays;
     }
 
-    private String clientFirstName;
-    private String password;
-    private Date clientDateOfBirth;
-    private BigDecimal monthlyNetSalary;
-    private Date creationDate;
-    private Date modificationDate;
-    private boolean overdraftEnabled;
-    private BigDecimal overdraftLimit;
-    private BigDecimal interestRateInitial;
-    private BigDecimal interestRateSubsequent;
-    private int maxOverdraftDays;
+    public  BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
 }

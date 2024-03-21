@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -48,6 +50,35 @@ public class AccountController {
             return ResponseEntity.ok("Connexion réussie !");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de la connexion. Verifier votre AccountNumber et Password");
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Account> updateAccount(@PathVariable("id") Long id, @RequestBody Account accountDetails) {
+        Account updatedAccount = accountService.updateAccount(id, accountDetails);
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+    }
+
+    @PostMapping("/{accountId}/withdraw")
+    public ResponseEntity<?> withdrawMoney(@PathVariable Long accountId, @RequestBody WithdrawalRequest withdrawalRequest) {
+        try {
+            Optional<Account> optionalAccount = accountService.findById(accountId);
+            if (!optionalAccount.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
+            Account account = optionalAccount.get();
+            boolean overdraftEnabled = account.isOverdraftEnabled();
+            BigDecimal balance = account.getBalance();
+            BigDecimal withdrawalAmount = withdrawalRequest.getAmount();
+
+            if (balance.compareTo(withdrawalAmount) >= 0 || (overdraftEnabled && balance.add(account.getOverdraftLimit()).compareTo(withdrawalAmount) >= 0)) {
+                accountService.withdrawMoney(account, withdrawalAmount);
+                return ResponseEntity.ok("Retrait d'argent effectué avec succès.");
+            } else {
+                return ResponseEntity.badRequest().body("Solde insuffisant pour effectuer ce retrait.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors du retrait d'argent.");
         }
     }
 }
