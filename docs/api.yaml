@@ -1,0 +1,410 @@
+  openapi: "3.0.3"
+  info:
+    title: Bank of Mada
+    version: "1.0"
+  servers:
+    - url: https://bankOfMada.com
+  paths:
+    /accounts:
+      get:
+        tags:
+          - "Account"
+        summary: Récupérer la liste des comptes
+        operationId: getAccounts
+        responses:
+          200:
+            description: Récupérer la liste des comptes avec succès
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Account'
+                example:
+                  - id: "123456"
+                    firstName: "John"
+                    lastName: "Doe"
+                    dateOfBirth: "1990-05-15"
+                    monthlySalary: 2500.0
+                    accountNumber: "ABC123456789"
+                  - id: "789012"
+                    firstName: "Alice"
+                    lastName: "Smith"
+                    dateOfBirth: "1985-10-20"
+                    monthlySalary: 3000.0
+                    accountNumber: "XYZ789012345"
+
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+      post:
+        tags:
+          - "Account"
+        summary: Créer un nouveau compte
+        operationId: createAccount
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        responses:
+          '200':
+            description: Compte créé avec succès
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+    /accounts/{accountId}:
+      get:
+        tags:
+          - "Account"
+        summary: Obtenir les détails d'un compte spécifique
+        operationId: getAccountDetails
+        parameters:
+          - in: path
+            name: accountId
+            required: true
+            description: ID du compte à récupérer
+            schema:
+              type: string
+        responses:
+          200:
+            description: Détails du compte récupérés avec succès
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Account'
+                example:
+                  id: "123456"
+                  firstName: "John"
+                  lastName: "Doe"
+                  dateOfBirth: "1990-05-15"
+                  monthlySalary: 2500.0
+                  accountNumber: "ABC123456789"
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+      put:
+        tags:
+          - "Account"
+        summary: Modifier les informations d'un compte
+        operationId: updateAccount
+        parameters:
+          - in: path
+            name: accountId
+            required: true
+            description: ID du compte à modifier
+            schema:
+              type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        responses:
+          200:
+            description: Compte modifié avec succès
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Account'
+                example:
+                  id: "123456"
+                  firstName: "John"
+                  lastName: "Doe"
+                  dateOfBirth: "1990-05-15"
+                  monthlySalary: 3000.0
+                  accountNumber: "ABC123456789"
+
+          400:
+            $ref: '#/components/responses'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+      delete:
+        tags:
+          - "Account"
+        summary: Supprimer un compte
+        operationId: deleteAccount
+        parameters:
+          - in: path
+            name: accountId
+            required: true
+            description: ID du compte à supprimer
+            schema:
+              type: string
+        responses:
+          200:
+            description: Compte supprimé avec succès
+          400:
+            $ref: '#/components/responses'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+    /accounts/{accountId}/withdrawals:
+      post:
+        tags:
+          - "Account"
+        summary: Effectuer un retrait sur un compte
+        operationId: makeWithdrawal
+        parameters:
+          - in: path
+            name: accountId
+            required: true
+            description: ID du compte pour le retrait
+            schema:
+              type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalRequest'
+        responses:
+          '200':
+            description: Retrait effectué avec succès
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+    /accounts/{accountId}/balance:
+      get:
+        tags:
+          - "Account"
+        summary: Obtenir le solde d'un compte
+        operationId: getAccountBalance
+        parameters:
+          - in: path
+            name: accountId
+            required: true
+            description: ID du compte pour le solde
+            schema:
+              type: string
+        responses:
+          200:
+            description: Solde du compte récupéré avec succès
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Account'
+                example:
+                  id: "123456"
+                  firstName: "John"
+                  lastName: "Doe"
+                  dateOfBirth: "1990-05-15"
+                  monthlySalary: 2500.0
+                  accountNumber: "ABC123456789"
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+    /transactions/{transactionId}/categories:
+      put:
+        tags:
+          - "Transaction"
+        summary: Catégoriser une opération bancaire
+        operationId: categorizeTransaction
+        parameters:
+          - in: path
+            name: transactionId
+            required: true
+            description: ID de l'opération bancaire à catégoriser
+            schema:
+              type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  category:
+                    type: string
+                  comment:
+                    type: string
+        responses:
+          '200':
+            description: Opération bancaire catégorisée avec succès
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+    /dashboard:
+      get:
+        tags:
+          - "Dashboard"
+        summary: Obtenir le tableau de bord du client
+        operationId: getClientDashboard
+        parameters:
+          - in: query
+            name: period
+            required: false
+            description: "Période pour laquelle obtenir le tableau de bord (par défaut: mois)"
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Tableau de bord du client récupéré avec succès
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    categoryPieChart:
+                      type: object
+                      additionalProperties:
+                        type: number
+                      example:
+                        Alimentation: 300
+                        Loisirs: 150
+                        Autre: 50
+                    incomeVsExpenseChart:
+                      type: object
+                      properties:
+                        income:
+                          type: number
+                        expense:
+                          type: number
+                      example:
+                        income: 1000
+                        expense: 500
+          400:
+            $ref: '#/components/responses'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+  components:
+    schemas:
+      Account:
+        type: object
+        properties:
+          id:
+            type: string
+          firstName:
+            type: string
+          lastName:
+            type: string
+          dateOfBirth:
+            type: string
+            format: date
+          monthlySalary:
+            type: number
+          accountNumber:
+            type: string
+        required:
+          - firstName
+          - lastName
+          - dateOfBirth
+          - monthlySalary
+          - accountNumber
+
+      WithdrawalRequest:
+        type: object
+        properties:
+          amount:
+            type: number
+          dateTime:
+            type: string
+            format: date-time
+        required:
+          - amount
+          - dateTime
+
+    responses:
+      DefaultResponse:
+        description: Default responses
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: object
+                  properties:
+                    code:
+                      type: integer
+                    message:
+                      type: string
+                body:
+                  type: object
+
+      SpecificResponse400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/responses/DefaultResponse'
+                - type: object
+                - properties:
+                    status:
+                      properties:
+                        code:
+                          default: 400
+                        message:
+                          default: "Bad Request"
+                    body:
+                      example: { }
+
+
+      SpecificResponse403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/responses/DefaultResponse'
+                - type: object
+                - properties:
+                    status:
+                      type: object
+                      properties:
+                        code:
+                          default: 403
+                        message:
+                          default: "Forbidden"
+                    body:
+                      example: {}
+      SpecificResponse500:
+        description: Internal Server Error
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/responses/DefaultResponse'
+                - type: object
+                - properties:
+                    status:
+                      properties:
+                        code:
+                          default: 500
+                        message:
+                          default: "Internal Server Error"
+                    body:
+                      example: {}
