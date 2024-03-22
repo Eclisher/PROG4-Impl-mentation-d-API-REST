@@ -1,0 +1,106 @@
+
+
+/* Style pour la section principale */
+section {
+    background-color: #eee;
+    padding: 50px 0;
+  }
+  
+  /* Style pour la zone de navigation par miettes de pain */
+  .bg-light {
+    background-color: #f8f9fa !important;
+  }
+  
+  .rounded-3 {
+    border-radius: 0.5rem !important;
+  }
+  
+  .p-3 {
+    padding: 1rem !important;
+  }
+  
+  /* Style pour les cartes */
+  .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+  
+  .mb-lg-0 {
+    margin-bottom: 0 !important;
+  }
+  
+  .text-center {
+    text-align: center !important;
+  }
+  
+  /* Style pour les boutons */
+  .d-flex {
+    display: flex !important;
+  }
+  
+  .justify-content-center {
+    justify-content: center !important;
+  }
+  
+  .ms-1 {
+    margin-left: 0.25rem !important;
+  }
+  
+  /* Style pour les listes */
+  .list-group {
+    margin-bottom: 0 !important;
+  }
+  
+  .list-group-item {
+    border-color: transparent !important;
+  }
+  
+  /* Style pour les icônes */
+  .fa-lg {
+    font-size: 1.5rem !important;
+  }
+  
+  /* Style pour les titres */
+  .text-primary {
+    color: #007bff !important;
+  }
+  
+  .font-italic {
+    font-style: italic !important;
+  }
+  
+  .me-1 {
+    margin-right: 0.25rem !important;
+  }
+  
+  /* Style pour les barres de progression */
+  .rounded {
+    border-radius: 0.25rem !important;
+  }
+  
+  /* Style pour les colonnes */
+  .col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+  
+  /* Style pour les lignes */
+  .row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y) * -1);
+    margin-right: calc(var(--bs-gutter-x) * -.5);
+    margin-left: calc(var(--bs-gutter-x) * -.5);
+  }
+  
+  /* Style pour les cartes de projet */
+  .card-text {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .card-body {
+    padding: 1rem !important;
+  }
+  
