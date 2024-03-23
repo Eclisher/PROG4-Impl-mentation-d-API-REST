@@ -12,7 +12,14 @@
     overdraftLimit DECIMAL,
     interestRateInitial DECIMAL,
     interestRateSubsequent DECIMAL,
+    interst DECIMAL,
     maxOverdraftDays INT
+    CONSTRAINT chk_overdraftLimit CHECK (overdraftLimit >= 0),
+    CONSTRAINT chk_interestRateInitial CHECK (interestRateInitial >= 0),
+    CONSTRAINT chk_interestRateSubsequent CHECK (interestRateSubsequent >= 0),
+    CONSTRAINT chk_maxOverdraftDays CHECK (maxOverdraftDays >= 0),
+    CONSTRAINT chk_dateOfBirth CHECK (clientDateOfBirth <= CURRENT_DATE - INTERVAL '21 years'),
+    UNIQUE (clientLastName, clientFirstName, clientDateOfBirth)
 );
     ALTER TABLE Account
         ALTER COLUMN creationDate SET DEFAULT now();

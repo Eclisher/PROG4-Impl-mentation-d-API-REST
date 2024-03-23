@@ -53,7 +53,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/accounts/{id}")
     public ResponseEntity<Account> updateAccount(@PathVariable("id") Long id, @RequestBody Account accountDetails) {
         Account updatedAccount = accountService.updateAccount(id, accountDetails);
         return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
@@ -72,13 +72,62 @@ public class AccountController {
             BigDecimal withdrawalAmount = withdrawalRequest.getAmount();
 
             if (balance.compareTo(withdrawalAmount) >= 0 || (overdraftEnabled && balance.add(account.getOverdraftLimit()).compareTo(withdrawalAmount) >= 0)) {
-                accountService.withdrawMoney(account, withdrawalAmount);
+                accountService.withdrawMoneyWithOverdraft(accountId, withdrawalAmount);
                 return ResponseEntity.ok("Retrait d'argent effectué avec succès.");
             } else {
                 return ResponseEntity.badRequest().body("Solde insuffisant pour effectuer ce retrait.");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors du retrait d'argent.");
+        }
+    }
+
+    @GetMapping("/{accountId}/balances")
+    public ResponseEntity<AccountBalancesResponse> getAccountBalances(@PathVariable Long accountId) {
+        try {
+            Account account = accountService.findById(accountId)
+                    .orElseThrow(() -> new RuntimeException("Compte non trouvé avec l'ID : " + accountId));
+
+            BigDecimal principalBalance = accountService.getPrincipalBalance(account);
+            BigDecimal loanAmount = accountService.getLoanAmount(account);
+            BigDecimal loanInterest = accountService.getLoanInterest(account);
+
+            AccountBalancesResponse response = new AccountBalancesResponse();
+            response.setPrincipalBalance(principalBalance);
+            response.setLoanAmount(loanAmount);
+            response.setLoanInterest(loanInterest);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    static class AccountBalancesResponse {
+        private BigDecimal principalBalance;
+        private BigDecimal loanAmount;
+        private BigDecimal loanInterest;
+
+        public BigDecimal getPrincipalBalance() {
+            return principalBalance;
+        }
+
+        public void setPrincipalBalance(BigDecimal principalBalance) {
+            this.principalBalance = principalBalance;
+        }
+
+        public BigDecimal getLoanAmount() {
+            return loanAmount;
+        }
+        public void setLoanAmount(BigDecimal loanAmount) {
+            this.loanAmount = loanAmount;
+        }
+
+        public BigDecimal getLoanInterest() {
+            return loanInterest;
+        }
+
+        public void setLoanInterest(BigDecimal loanInterest) {
+            this.loanInterest = loanInterest;
         }
     }
 }

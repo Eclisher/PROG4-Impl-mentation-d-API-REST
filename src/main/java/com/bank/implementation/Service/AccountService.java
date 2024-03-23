@@ -55,17 +55,50 @@ public class AccountService {
         return Optional.ofNullable(accountRepository.findById(accountId));
     }
 
-    public void withdrawMoney(Account account, BigDecimal amount) {
-        BigDecimal currentBalance = account.getBalance();
-        BigDecimal newBalance = currentBalance.subtract(amount);
-        account.setBalance(newBalance);
-        account.setModificationDate(new Date());
-        accountRepository.save(account);
+    public void withdrawMoneyWithOverdraft(Long accountId, BigDecimal amount) {
+        Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            BigDecimal currentBalance = account.getBalance();
+            BigDecimal overdraftLimit = account.getOverdraftLimit();
+            boolean overdraftEnabled = account.isOverdraftEnabled();
+            if (!overdraftEnabled && currentBalance.compareTo(amount) < 0) {
+                throw new RuntimeException("Solde insuffisant pour effectuer ce retrait.");
+            }
+            BigDecimal totalAvailableBalance = currentBalance.add(overdraftLimit);
+
+            if (totalAvailableBalance.compareTo(amount) < 0) {
+                throw new RuntimeException("Solde insuffisant pour effectuer ce retrait.");
+            }
+
+            BigDecimal newBalance = currentBalance.subtract(amount);
+            account.setBalance(newBalance);
+            account.setModificationDate(new Date());
+            BigDecimal interestRate = BigDecimal.ZERO;
+            int maxOverdraftDays = account.getMaxOverdraftDays();
+            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                // Solde négatif, calcul des intérêts
+                BigDecimal overdraftAmount = newBalance.abs();
+                BigDecimal initialInterest = overdraftAmount.multiply(account.getInterestRateInitial().divide(BigDecimal.valueOf(100)));
+                BigDecimal subsequentInterest = BigDecimal.ZERO;
+                if (maxOverdraftDays > 7) {
+                    int subsequentDays = maxOverdraftDays - 7;
+                    BigDecimal subsequentInterestRate = account.getInterestRateSubsequent().divide(BigDecimal.valueOf(100));
+                    subsequentInterest = overdraftAmount.multiply(subsequentInterestRate).multiply(BigDecimal.valueOf(subsequentDays));
+                }
+                interestRate = initialInterest.add(subsequentInterest);
+            }
+            account.setInterest(interestRate);
+            accountRepository.save(account);
+        } else {
+            throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
+        }
     }
 
     public BigDecimal getPrincipalBalance(Account account) {
         return account.getBalance();
     }
+
 
     public BigDecimal getLoanAmount(Account account) {
         if (account.isOverdraftEnabled()) {

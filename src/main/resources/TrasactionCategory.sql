@@ -1,7 +1,5 @@
 CREATE TABLE TransactionCategory (
-    transactionCategoryID INT PRIMARY KEY,
-    transactionID INT,
-    categoryID INT,
-    FOREIGN KEY (transactionID) REFERENCES Transaction(transactionID),
-    FOREIGN KEY (categoryID) REFERENCES Category(categoryID)
+                                     transactionCategoryID SERIAL PRIMARY KEY,
+                                     transactionID INT REFERENCES Transaction(transactionID),
+                                     categoryID INT REFERENCES Category(categoryID)
 );

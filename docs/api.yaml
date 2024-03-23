@@ -44,23 +44,34 @@
       post:
         tags:
           - "Account"
-        summary: Créer un nouveau compte
-        operationId: createAccount
+        summary: Créer un nouveau compte bancaire
         requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Account'
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    clientLastName:
+                      type: string
+                    clientFirstName:
+                      type: string
+                    clientDateOfBirth:
+                      type: string
+                      format: date
+                    monthlyNetSalary:
+                      type: number
+                    accountNumber:
+                      type: string
         responses:
-          '200':
-            description: Compte créé avec succès
-          400:
-            $ref: '#/components/responses/SpecificResponse400'
-          403:
-            $ref: '#/components/responses/SpecificResponse403'
-          500:
-            $ref: '#/components/responses/SpecificResponse500'
+            '201':
+              description: Compte créé avec succès
+            400:
+              $ref: '#/components/responses/SpecificResponse400'
+            403:
+              $ref: '#/components/responses/SpecificResponse403'
+            500:
+              $ref: '#/components/responses/SpecificResponse500'
 
     /accounts/{accountId}:
       get:

@@ -10,8 +10,9 @@ public class Transaction {
     private LocalDateTime effectDate;
     private LocalDateTime registrationDate;
     private String status;
+    private Long accountId;
 
-    public Transaction( LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status) {
+    public Transaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status, Long accountId) {
         this.transactionDateTime = transactionDateTime;
         this.amount = amount;
         this.transactionType = transactionType;
@@ -19,6 +20,29 @@ public class Transaction {
         this.effectDate = effectDate;
         this.registrationDate = registrationDate;
         this.status = status;
+        this.accountId = accountId;
+    }
+
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public Transaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status) {
+        this.transactionDateTime = transactionDateTime;
+        this.amount = amount;
+        this.transactionType = transactionType;
+        this.reason = reason;
+        this.effectDate = effectDate;
+        this.registrationDate = registrationDate;
+        this.status = status;
+    }
+
+    public Transaction() {
+
     }
 
 

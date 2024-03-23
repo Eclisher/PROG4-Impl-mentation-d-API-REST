@@ -16,6 +16,20 @@ public class Account {
     private BigDecimal overdraftLimit;
     private BigDecimal interestRateInitial;
     private BigDecimal interestRateSubsequent;
+    private  BigDecimal interest;
+
+    public BigDecimal getInterest() {
+        return interest;
+    }
+
+    public void setInterest(BigDecimal interest) {
+        this.interest = interest;
+    }
+
+    public Account(BigDecimal interest) {
+        this.interest = interest;
+    }
+
     private int maxOverdraftDays;
     public void setAccountID(int accountID) {
         this.accountID = accountID;
