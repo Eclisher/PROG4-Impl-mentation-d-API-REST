@@ -43,6 +43,13 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
+    @GetMapping("/accounts/{accountId}")
+    public ResponseEntity<Account> getAccountById(@PathVariable Long accountId) {
+        Optional<Account> accountOptional = accountService.findById(accountId);
+        return accountOptional.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody SignInRequest signInRequest) {
         boolean signInResult = accountService.signIn(signInRequest.getAccountNumber(), signInRequest.getPassword());
@@ -56,7 +63,21 @@ public class AccountController {
     @PutMapping("/accounts/{id}")
     public ResponseEntity<Account> updateAccount(@PathVariable("id") Long id, @RequestBody Account accountDetails) {
         Account updatedAccount = accountService.updateAccount(id, accountDetails);
-        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+        if (updatedAccount != null) {
+            return ResponseEntity.ok(updatedAccount);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/accounts/{id}")
+    public ResponseEntity<String> deleteAccountById(@PathVariable("id") Long accountId) {
+        try {
+            accountService.deleteById(accountId);
+            return ResponseEntity.ok("Compte supprimé avec succès");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping("/{accountId}/withdraw")
@@ -81,6 +102,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors du retrait d'argent.");
         }
     }
+
 
     @GetMapping("/{accountId}/balances")
     public ResponseEntity<AccountBalancesResponse> getAccountBalances(@PathVariable Long accountId) {

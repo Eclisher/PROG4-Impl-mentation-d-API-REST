@@ -32,31 +32,16 @@ public class AccountService {
         return !accounts.isEmpty();
     }
 
-    public Account updateAccount(Long accountId, Account accountDetails) {
-        Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
-
-        if (optionalAccount.isPresent()) {
-            Account existingAccount = optionalAccount.get();
-            existingAccount.setClientFirstName(accountDetails.getClientFirstName());
-            existingAccount.setClientDateOfBirth(accountDetails.getClientDateOfBirth());
-            existingAccount.setMonthlyNetSalary(accountDetails.getMonthlyNetSalary());
-            existingAccount.setOverdraftEnabled(accountDetails.isOverdraftEnabled());
-            existingAccount.setOverdraftLimit(accountDetails.getOverdraftLimit());
-            existingAccount.setInterestRateInitial(accountDetails.getInterestRateInitial());
-            existingAccount.setInterestRateSubsequent(accountDetails.getInterestRateSubsequent());
-            existingAccount.setMaxOverdraftDays(accountDetails.getMaxOverdraftDays());
-            existingAccount.setModificationDate(new Date());
-            return accountRepository.save(existingAccount);
-        } else {
-            throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
-        }
+    public Account updateAccount(Long id, Account account) {
+        return accountRepository.update(account);
     }
     public Optional<Account> findById(Long accountId) {
         return Optional.ofNullable(accountRepository.findById(accountId));
     }
 
     public void withdrawMoneyWithOverdraft(Long accountId, BigDecimal amount) {
-        Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
+        try{
+            Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
         if (optionalAccount.isPresent()) {
             Account account = optionalAccount.get();
             BigDecimal currentBalance = account.getBalance();
@@ -89,9 +74,13 @@ public class AccountService {
                 interestRate = initialInterest.add(subsequentInterest);
             }
             account.setInterest(interestRate);
-            accountRepository.save(account);
-        } else {
-            throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
+            accountRepository.update(account);
+        }
+            else {
+                throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
+            }
+        } catch (Exception e) {
+          throw new RuntimeException();
         }
     }
 
@@ -145,6 +134,14 @@ public class AccountService {
             BigDecimal newBalance = currentBalance.add(amount);
             account.setBalance(newBalance);
             accountRepository.save(account);
+        } else {
+            throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
+        }
+    }
+    public void deleteById(Long accountId) {
+        Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
+        if (optionalAccount.isPresent()) {
+            accountRepository.deleteById(accountId);
         } else {
             throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
         }

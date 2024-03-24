@@ -24,12 +24,15 @@ public class AccountRepository {
     private static final String INTERESTRATEINITIAL_COLUMN = "interestrateinitial";
     private static final String INTERESTRATESUBSEQUENT_COLUMN = "interestratesubsequent";
     private static final String MAXOVERDRAFTDAYS_COLUMN = "maxoverdraftdays";
+    private static final String BALANCE_COLUMN = "balance";
+
+
 
     public Account save(Account account) {
         String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
                 "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
-                "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = PostgresqlConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, account.getAccountNumber());
@@ -48,7 +51,10 @@ public class AccountRepository {
             preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
             preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
             preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
-            preparedStatement.setInt(13, account.getMaxOverdraftDays());
+            preparedStatement.setLong(13, account.getAccountID());
+            preparedStatement.setBigDecimal(14, account.getBalance());
+
+
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
                 ResultSet rs = preparedStatement.getGeneratedKeys();
@@ -86,7 +92,7 @@ public class AccountRepository {
                 account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
                 account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
                 account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
-
+                account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
                 accounts.add(account);
             }
         } catch (SQLException e) {
@@ -134,6 +140,7 @@ public class AccountRepository {
                 account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
                 account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
                 account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
+                account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
                 return account;
             }
         } catch (SQLException e) {
@@ -142,5 +149,53 @@ public class AccountRepository {
         return null;
     }
 
+    public boolean deleteById(Long accountId) {
+        String query = "DELETE FROM Account WHERE accountId = ?";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setLong(1, accountId);
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Account update(Account account) {
+        String query = "UPDATE Account SET accountNumber = ?, clientLastName = ?, clientFirstName = ?, " +
+                "password = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, " +
+                "modificationDate = ?, overdraftEnabled = ?, overdraftLimit = ?, " +
+                "interestRateInitial = ?, interestRateSubsequent = ?, maxOverdraftDays = ? , balance = ? " +
+                "WHERE accountId = ?";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, account.getAccountNumber());
+            preparedStatement.setString(2, account.getClientLastName());
+            preparedStatement.setString(3, account.getClientFirstName());
+            preparedStatement.setString(4, account.getPassword());
+            if (account.getClientDateOfBirth() != null) {
+                preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
+            } else {
+                preparedStatement.setNull(5, Types.DATE);
+            }
+            preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
+            preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+            preparedStatement.setBoolean(8, account.isOverdraftEnabled());
+            preparedStatement.setBigDecimal(9, account.getOverdraftLimit());
+            preparedStatement.setBigDecimal(10, account.getInterestRateInitial());
+            preparedStatement.setBigDecimal(11, account.getInterestRateSubsequent());
+            preparedStatement.setInt(12, account.getMaxOverdraftDays());
+            preparedStatement.setLong(13, account.getAccountID());
+            preparedStatement.setBigDecimal(14, account.getBalance());
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                return account;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
