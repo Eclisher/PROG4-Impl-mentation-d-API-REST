@@ -3,6 +3,7 @@ package com.bank.implementation.Model;
 import java.time.LocalDateTime;
 
 public class Transaction {
+    private Long transactionId;
     private LocalDateTime transactionDateTime;
     private double amount;
     private String transactionType;
@@ -11,8 +12,9 @@ public class Transaction {
     private LocalDateTime registrationDate;
     private String status;
     private Long accountId;
-
-    public Transaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status, Long accountId) {
+    private  Long categoryId;
+    public Transaction(Long transactionId, LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status, Long accountId, Long categoryId) {
+        this.transactionId = transactionId;
         this.transactionDateTime = transactionDateTime;
         this.amount = amount;
         this.transactionType = transactionType;
@@ -21,6 +23,23 @@ public class Transaction {
         this.registrationDate = registrationDate;
         this.status = status;
         this.accountId = accountId;
+        this.categoryId = categoryId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
     }
 
     public Long getAccountId() {
@@ -31,15 +50,6 @@ public class Transaction {
         this.accountId = accountId;
     }
 
-    public Transaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status) {
-        this.transactionDateTime = transactionDateTime;
-        this.amount = amount;
-        this.transactionType = transactionType;
-        this.reason = reason;
-        this.effectDate = effectDate;
-        this.registrationDate = registrationDate;
-        this.status = status;
-    }
 
     public Transaction() {
 

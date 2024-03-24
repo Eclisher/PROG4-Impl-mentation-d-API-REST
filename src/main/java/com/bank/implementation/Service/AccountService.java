@@ -137,6 +137,18 @@ public class AccountService {
         }
         return interest;
     }
+    public void depositMoney(Long accountId, BigDecimal amount) {
+        Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            BigDecimal currentBalance = account.getBalance();
+            BigDecimal newBalance = currentBalance.add(amount);
+            account.setBalance(newBalance);
+            accountRepository.save(account);
+        } else {
+            throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
+        }
+    }
 
 }
 

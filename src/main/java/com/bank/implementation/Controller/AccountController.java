@@ -102,33 +102,16 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    static class AccountBalancesResponse {
-        private BigDecimal principalBalance;
-        private BigDecimal loanAmount;
-        private BigDecimal loanInterest;
 
-        public BigDecimal getPrincipalBalance() {
-            return principalBalance;
-        }
-
-        public void setPrincipalBalance(BigDecimal principalBalance) {
-            this.principalBalance = principalBalance;
-        }
-
-        public BigDecimal getLoanAmount() {
-            return loanAmount;
-        }
-        public void setLoanAmount(BigDecimal loanAmount) {
-            this.loanAmount = loanAmount;
-        }
-
-        public BigDecimal getLoanInterest() {
-            return loanInterest;
-        }
-
-        public void setLoanInterest(BigDecimal loanInterest) {
-            this.loanInterest = loanInterest;
+    @PostMapping("/{accountId}/deposit")
+        public ResponseEntity<String> depositMoney(@PathVariable Long accountId, @RequestBody DepositRequest depositRequest) {
+        try {
+            accountService.depositMoney(accountId, depositRequest.getAmount());
+            return ResponseEntity.ok("Approvisionnement de solde effectué avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors de l'approvisionnement de solde.");
         }
     }
+
 }
 

@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class TransactionRepository {
@@ -21,6 +23,7 @@ public class TransactionRepository {
     private static final String EFFECT_DATE_COLUMN = "effectDate";
     private static final String STATUS_COLUMN = "status";
     private static final String ACCOUNT_ID_COLUMN = "accountID";
+    private static final String TRANSACTION_ID_COLUMN = "transactionID";
 
     public void createTransaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, String status) {
         String query = "INSERT INTO " + TRANSACTION_TABLE_NAME + " (" + TRANSACTION_DATETIME_COLUMN + ", " + AMOUNT_COLUMN + ", " +
@@ -87,8 +90,8 @@ public class TransactionRepository {
 
     public void createDepositTransaction(double amount, String reason, LocalDateTime effectDate, Long accountId) {
         String query = "INSERT INTO " + TRANSACTION_TABLE_NAME + " (" + TRANSACTION_DATETIME_COLUMN + ", " + AMOUNT_COLUMN + ", " +
-                TRANSACTION_TYPE_COLUMN + ", " + REASON_COLUMN + ", " + EFFECT_DATE_COLUMN + ", " + STATUS_COLUMN + ", " + ACCOUNT_ID_COLUMN + ") " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                TRANSACTION_TYPE_COLUMN + ", " + REASON_COLUMN + ", " + EFFECT_DATE_COLUMN + ", " + STATUS_COLUMN + ", " + ACCOUNT_ID_COLUMN + ", " + TRANSACTION_ID_COLUMN +" ) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = PostgresqlConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
@@ -102,5 +105,72 @@ public class TransactionRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public void updateTransactionCategory(Long transactionId, Long categoryId) {
+            String query = "UPDATE " + TRANSACTION_TABLE_NAME + " SET categoryId = ? WHERE id = ?";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setLong(1, categoryId);
+                preparedStatement.setLong(2, transactionId);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+    }
+    public Map<String, BigDecimal> getCategoryAmountsInPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        Map<String, BigDecimal> categoryAmounts = new HashMap<>();
+        String query = "SELECT category, SUM(amount) AS total_amount FROM transactions " +
+                "WHERE transaction_date BETWEEN ? AND ? " +
+                "GROUP BY category";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(startDate));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(endDate));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String category = resultSet.getString("category");
+                BigDecimal totalAmount = resultSet.getBigDecimal("total_amount");
+                categoryAmounts.put(category, totalAmount);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categoryAmounts;
+    }
+
+    public BigDecimal getTotalExpensesInPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        BigDecimal totalExpenses = BigDecimal.ZERO;
+        String query = "SELECT SUM(amount) AS total_expenses FROM transactions " +
+                "WHERE transaction_date BETWEEN ? AND ? AND transaction_type = 'expense'";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(startDate));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(endDate));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                totalExpenses = resultSet.getBigDecimal("total_expenses");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totalExpenses;
+    }
+
+    public BigDecimal getTotalIncomeInPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        BigDecimal totalIncome = BigDecimal.ZERO;
+        String query = "SELECT SUM(amount) AS total_income FROM transactions " +
+                "WHERE transaction_date BETWEEN ? AND ? AND transaction_type = 'income'";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(startDate));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(endDate));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                totalIncome = resultSet.getBigDecimal("total_income");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totalIncome;
     }
 }
