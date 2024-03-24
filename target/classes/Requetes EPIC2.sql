@@ -1,19 +1,20 @@
--- F1 Catégorisation des transactions
+-- F1 : Catégorisation des transactions
 CREATE PROCEDURE CategorizeTransactions
     @transactionIDs VARCHAR(MAX),
     @categoryID INT
 AS
 BEGIN
-    INSERT INTO TransactionCategory (transactionID, categoryID)
-    SELECT value, @categoryID
-    FROM STRING_SPLIT(@transactionIDs, ',');
+INSERT INTO TransactionCategory (transactionID, categoryID)
+SELECT value, @categoryID
+FROM STRING_SPLIT(@transactionIDs, ',');
 END;
 
---  F2 Somme des montants par catégorie dans une période donnée
+
+-- F2 Somme des montants par catégorie dans une période donnée
 SELECT c.categoryName, SUM(t.amount) AS totalAmount
 FROM Transaction t
-INNER JOIN TransactionCategory tc ON t.transactionID = tc.transactionID
-INNER JOIN Category c ON tc.categoryID = c.categoryID
+         INNER JOIN TransactionCategory tc ON t.transactionID = tc.transactionID
+         INNER JOIN Category c ON tc.categoryID = c.categoryID
 WHERE t.transactionDateTime BETWEEN @startDate AND @endDate
 GROUP BY c.categoryName;
 

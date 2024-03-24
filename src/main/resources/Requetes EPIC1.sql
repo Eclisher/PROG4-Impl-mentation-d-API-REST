@@ -1,70 +1,78 @@
--- F1  Création d'un nouveau compte
-INSERT INTO BankAccount (accountID, accountNumber, clientLastName, clientFirstName, clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+-- F1 Création d'un nouveau compte
+INSERT INTO Account (accountNumber, clientLastName, clientFirstName, clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Modification des informations d'un compte existant
-UPDATE BankAccount
+UPDATE Account
 SET clientLastName = ?, clientFirstName = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, modificationDate = ?
 WHERE accountID = ?;
 
-
---  F2 Retrait d'argent
+-- F2 : Retrait d'argent
 CREATE PROCEDURE WithdrawMoney
     @accountID INT,
     @amount DECIMAL,
     @transactionDateTime DATETIME
 AS
 BEGIN
-    DECLARE @currentBalance DECIMAL;
-    SELECT @currentBalance = principalBalance
-    FROM Balance
-    WHERE accountID = @accountID;
+DECLARE @currentBalance DECIMAL;
+SELECT @currentBalance = principalBalance
+FROM Balance
+WHERE accountID = @accountID;
 
-    IF @currentBalance >= @amount
+IF @currentBalance >= @amount
     BEGIN
         -- Effectuer le retrait
-        INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
-        VALUES (@transactionDateTime, -@amount, 'Withdrawal', @accountID);
+INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
+VALUES (@transactionDateTime, -@amount, 'Withdrawal', @accountID);
 
-        -- Mettre à jour le solde principal
-        UPDATE Balance
-        SET principalBalance = principalBalance - @amount
-        WHERE accountID = @accountID;
+-- Mettre à jour le solde principal
+UPDATE Balance
+SET principalBalance = principalBalance - @amount
+WHERE accountID = @accountID;
 
-        SELECT 'Retrait effectué avec succès' AS Message;
-    END
+SELECT 'Retrait effectué avec succès' AS Message;
+END
     ELSE
-    BEGIN
-        SELECT 'Solde insuffisant pour effectuer le retrait' AS Message;
-    END
+BEGIN
+SELECT 'Solde insuffisant pour effectuer le retrait' AS Message;
+END
 END;
+
 
 -- F3 Consultation du solde principal d'un compte
-SELECT principalBalance
-FROM Balance
-WHERE accountID = ?;
+CREATE OR REPLACE FUNCTION get_account_balance(account_id INT, date DATE)
+    RETURNS DECIMAL AS $$
+DECLARE
+    principal_balance DECIMAL;
+BEGIN
+    SELECT principalBalance INTO principal_balance
+    FROM Balance
+    WHERE accountID = account_id AND transactionDateTime <= date
+    ORDER BY transactionDateTime DESC
+    LIMIT 1;
 
--- Consultation des soldes principal, des prêts et des intérêts
-SELECT principalBalance, loanAmount, loanInterest
-FROM Balance
-WHERE accountID = ?;
+    RETURN principal_balance;
+END;
+$$ LANGUAGE plpgsql;
 
 -- F4 Approvisionnement du solde via virement entrant depuis une banque externe
-CREATE PROCEDURE IncomingTransfer
-    @accountID INT,
-    @amount DECIMAL,
-    @transferDateTime DATETIME
-AS
+CREATE OR REPLACE PROCEDURE IncomingTransfer
+(IN p_accountID INT, IN p_amount DECIMAL, IN p_transferDateTime TIMESTAMP)
+    LANGUAGE plpgsql
+AS $$
 BEGIN
     INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
-    VALUES (@transferDateTime, @amount, 'Incoming Transfer', @accountID);
+    VALUES (p_transferDateTime, p_amount, 'Incoming Transfer', p_accountID);
 
     UPDATE Balance
-    SET principalBalance = principalBalance + @amount
-    WHERE accountID = @accountID;
-END;
+    SET principalBalance = principalBalance + p_amount
+    WHERE accountID = p_accountID;
 
---F5 Virement entre comptes de la même banque
+    RAISE NOTICE 'Approvisionnement du solde via virement entrant effectué avec succès';
+END;
+$$;
+
+-- F5 : Virement entre comptes de la même banque
 CREATE PROCEDURE InternalTransfer
     @sourceAccountID INT,
     @destinationAccountID INT,
@@ -72,36 +80,37 @@ CREATE PROCEDURE InternalTransfer
     @transferDateTime DATETIME
 AS
 BEGIN
-    DECLARE @currentBalance DECIMAL;
-    SELECT @currentBalance = principalBalance
-    FROM Balance
-    WHERE accountID = @sourceAccountID;
+DECLARE @currentBalance DECIMAL;
+SELECT @currentBalance = principalBalance
+FROM Balance
+WHERE accountID = @sourceAccountID;
 
-    IF @currentBalance >= @amount
+IF @currentBalance >= @amount
     BEGIN
-        INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
-        VALUES (@transferDateTime, -@amount, 'Outgoing Transfer', @sourceAccountID);
+INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
+VALUES (@transferDateTime, -@amount, 'Outgoing Transfer', @sourceAccountID);
 
-        INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
-        VALUES (@transferDateTime, @amount, 'Incoming Transfer', @destinationAccountID);
+INSERT INTO Transaction (transactionDateTime, amount, transactionType, accountID)
+VALUES (@transferDateTime, @amount, 'Incoming Transfer', @destinationAccountID);
 
-        UPDATE Balance
-        SET principalBalance = principalBalance - @amount
-        WHERE accountID = @sourceAccountID;
+UPDATE Balance
+SET principalBalance = principalBalance - @amount
+WHERE accountID = @sourceAccountID;
 
-        UPDATE Balance
-        SET principalBalance = principalBalance + @amount
-        WHERE accountID = @destinationAccountID;
+UPDATE Balance
+SET principalBalance = principalBalance + @amount
+WHERE accountID = @destinationAccountID;
 
-        SELECT 'Virement effectué avec succès' AS Message;
-    END
+SELECT 'Virement effectué avec succès' AS Message;
+END
     ELSE
-    BEGIN
-        SELECT 'Solde insuffisant pour effectuer le virement' AS Message;
-    END
+BEGIN
+SELECT 'Solde insuffisant pour effectuer le virement' AS Message;
+END
 END;
 
---  F6 Relevé de compte pour une période donnée
+
+-- F6 : Relevé de compte pour une période donnée
 SELECT transactionDateTime, reference, transactionType, amount, principalBalance
 FROM Statement
 WHERE accountID = ? AND transactionDateTime BETWEEN ? AND ?
