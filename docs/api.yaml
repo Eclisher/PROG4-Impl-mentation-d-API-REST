@@ -465,7 +465,7 @@ paths:
                       income: 1000
                       expense: 500
         400:
-          $ref: '#/components/responses'
+          $ref: '#/components/responses/SpecificResponse400'
         403:
           $ref: '#/components/responses/SpecificResponse403'
         500:
@@ -487,6 +487,12 @@ paths:
                 - balanceId: "abc123"
                   accountId: "xyz789"
                   currentBalance: 1000.0
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
 
     put:
       summary: Create or update balances
@@ -607,7 +613,7 @@ paths:
           $ref: '#/components/responses/SpecificResponse500'
   /transfer/{transferId}:
     get:
-      summary: Retrieve a transfer by its ID
+      summary: Retrieve a transfer by ID
       operationId: getTransferById
       tags:
         - Transfer
@@ -630,7 +636,7 @@ paths:
         500:
           $ref: '#/components/responses/SpecificResponse500'
     delete:
-      summary: Delete a transfer by its ID
+      summary: Delete a transfer by ID
       operationId: deleteTransferById
       tags:
         - Transfer
@@ -653,6 +659,101 @@ paths:
         500:
           $ref: '#/components/responses/SpecificResponse500'
 
+  /statement:
+    get:
+      summary: Retrieve all statement 
+      operationId: getAllStatement
+      tags:
+        - Statement
+      responses:
+        200:
+          description: List of all statement retrivied successfully
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500' 
+
+    put:
+      summary: Create or update statement
+      operationId: createOrUpdateStatement
+      tags:
+        - Statement
+      requestBody: 
+        required: true 
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Statement'
+      responses:
+        200: 
+          description: Statement create or update successfully
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /statement/{statementId}:
+    get:
+      summary: Retrieve a statement by ID
+      operationId: getStatementById
+      tags:
+        - Statement
+      parameters:
+        - in: path
+          name: StatementId
+          required: true
+          schema:
+            type: string
+          description: The ID of the statement to retrieve
+      responses:
+        200:
+          description: Statement retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a statement by ID
+      operationId: deleteTransferById
+      tags:
+        - Statement
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the statement to delete
+      responses:
+        200:
+          description: Statement deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
 components:
   schemas:
     Transfer:
@@ -736,6 +837,16 @@ components:
         - amount
         - dateTime
 
+    Statement: 
+      type: object
+      properties:
+        idStatement:
+          type: string
+          description: ID of statement
+        transaction: 
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
     balance:
       type: object
       properties:
