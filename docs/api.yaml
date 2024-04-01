@@ -335,6 +335,23 @@ paths:
           $ref: '#/components/responses/SpecificResponse400'
         '500':
           $ref: '#/components/responses/SpecificResponse500'
+  /category: 
+    get:
+      summary: Retrieve all categories of transaction
+      operationId: getAllTransactionCategory
+      tags:
+        - TransactionCategory
+      responses:
+        200:
+          description: List of transaction categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
   /dashboard:
     get:
       tags:
@@ -361,9 +378,9 @@ paths:
                     additionalProperties:
                       type: number
                     example:
-                      Alimentation: 300
-                      Loisirs: 150
-                      Autre: 50
+                      Food: 300
+                      Hobbies: 150
+                      Others: 50
                   incomeVsExpenseChart:
                     type: object
                     properties:
@@ -658,7 +675,16 @@ components:
           description: amount of the balance.
         balanceDatetime:
           type: string
-          format: date-time    
+          format: date-time 
+    Category: 
+      type: object
+      properties:
+        idCategory:
+          type: string
+        name:
+          type: string
+        TransactionType:
+          type: string
   responses:
     DefaultResponse:
       description: Default responses
