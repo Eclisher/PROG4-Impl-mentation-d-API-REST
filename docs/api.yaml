@@ -7,6 +7,8 @@ servers:
 tags:
 - name: Account
 - name: Transaction
+- name: Balance
+- name: Transaction
 
 paths:
   /accounts:
@@ -236,7 +238,23 @@ paths:
         500:
           $ref: '#/components/responses/SpecificResponse500'
 
-  /transactions/{transactionId}/categories:
+  /transaction:
+    get:
+      summary: Retrieve all transactions
+      operationId: getAllTransactions
+      tags:
+        - Transaction
+      responses:
+        '200':
+          description: List of transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '500':
+          $ref: '#/components/responses/SpecificResponse500'
     put:
       tags:
         - "Transaction"
@@ -268,6 +286,54 @@ paths:
         403:
           $ref: '#/components/responses/SpecificResponse403'
         500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /transaction/{id}:
+    get:
+      summary: Retrieve a transaction by its ID
+      operationId: getTransactionById
+      tags:
+        - Transaction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction to retrieve
+      responses:
+        200:
+          description: Transaction retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a transaction by its ID
+      operationId: deleteTransactionById
+      tags:
+        - Transaction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction to delete
+      responses:
+        '200':
+          description: Transaction deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          $ref: '#/components/responses/SpecificResponse400'
+        '500':
           $ref: '#/components/responses/SpecificResponse500'
   /dashboard:
     get:
