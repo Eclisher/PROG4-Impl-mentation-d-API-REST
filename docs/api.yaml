@@ -340,7 +340,7 @@ paths:
       summary: Retrieve all categories of transaction
       operationId: getAllTransactionCategory
       tags:
-        - TransactionCategory
+        - Category
       responses:
         200:
           description: List of transaction categories retrieved successfully
@@ -351,6 +351,79 @@ paths:
                 items:
                   $ref: '#/components/schemas/Category'
         500:
+          $ref: '#/components/responses/SpecificResponse500'
+    put:
+      summary: Create or update transaction categories
+      operationId: createOrUpdateTransactionCategory
+      tags:
+        - Category
+      requestBody:
+        required: true
+        description: If an id was provided , the categories of transaction will be updated
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+      responses:
+        200:
+          description: Transaction category created or updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /transaction-category/{id}:
+    get:
+      summary: Retrieve a transaction category by its ID
+      operationId: getTransactionCategoryById
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction category to retrieve
+      responses:
+        200:
+          description: Transaction category retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    delete:
+      summary: Delete a transaction category by its ID
+      operationId: deleteTransactionCategoryById
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction category to delete
+      responses:
+        '200':
+          description: Transaction category deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/SpecificResponse400'
+        '500':
           $ref: '#/components/responses/SpecificResponse500'
   /dashboard:
     get:
@@ -403,7 +476,7 @@ paths:
       tags:
         - Balance
       responses:
-        '200':
+        200:
           description: Successfully got all balances
           content:
             application/json:
@@ -433,7 +506,7 @@ paths:
                 balanceDatetime: "2023-04-01T10:00:00Z"
                 idAccount: "abc123"
       responses:
-        '200':
+        200:
           description: Successfully created or updated balances
           content:
             application/json:
