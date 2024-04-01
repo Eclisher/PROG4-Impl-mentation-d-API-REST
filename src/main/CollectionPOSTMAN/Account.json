@@ -144,6 +144,32 @@
         "description": "Get the balances of the account"
       },
       "response": []
+    },
+    {
+      "name": "Deposit Money",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 1000.00\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/9/deposit",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "9",
+            "deposit"
+          ]
+        },
+        "description": "Deposit money into the account"
+      },
+      "response": []
     }
+
   ]
 }

@@ -32,7 +32,7 @@ public class AccountService {
         return !accounts.isEmpty();
     }
 
-    public Account updateAccount(Long id, Account account) {
+    public Account updateAccount(Account account) {
         return accountRepository.update(account);
     }
     public Optional<Account> findById(Long accountId) {
@@ -62,7 +62,6 @@ public class AccountService {
             BigDecimal interestRate = BigDecimal.ZERO;
             int maxOverdraftDays = account.getMaxOverdraftDays();
             if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-                // Solde négatif, calcul des intérêts
                 BigDecimal overdraftAmount = newBalance.abs();
                 BigDecimal initialInterest = overdraftAmount.multiply(account.getInterestRateInitial().divide(BigDecimal.valueOf(100)));
                 BigDecimal subsequentInterest = BigDecimal.ZERO;
@@ -111,14 +110,10 @@ public class AccountService {
         if (loanAmount.compareTo(BigDecimal.ZERO) > 0) {
             int maxOverdraftDays = account.getMaxOverdraftDays();
             if (maxOverdraftDays <= 7) {
-                // Calcul des intérêts pour les 7 premiers jours
                 interest = loanAmount.multiply(interestRateInitial.divide(BigDecimal.valueOf(100)));
             } else {
-                // Calcul des intérêts pour les jours suivants
                 BigDecimal interestRateForSubsequentDays = interestRateSubsequent.divide(BigDecimal.valueOf(100));
-                // Calcul du nombre de jours pour lesquels les intérêts doivent être calculés
                 int numberOfSubsequentDays = maxOverdraftDays - 7;
-                // Calcul des intérêts pour les jours suivants
                 interest = loanAmount.multiply(interestRateForSubsequentDays).multiply(BigDecimal.valueOf(numberOfSubsequentDays));
             }
         } else {
@@ -126,6 +121,7 @@ public class AccountService {
         }
         return interest;
     }
+
     public void depositMoney(Long accountId, BigDecimal amount) {
         Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
         if (optionalAccount.isPresent()) {
@@ -133,11 +129,12 @@ public class AccountService {
             BigDecimal currentBalance = account.getBalance();
             BigDecimal newBalance = currentBalance.add(amount);
             account.setBalance(newBalance);
-            accountRepository.save(account);
+            accountRepository.saveOrUpdateAccount(account);
         } else {
             throw new RuntimeException("Compte non trouvé avec l'ID : " + accountId);
         }
     }
+
     public void deleteById(Long accountId) {
         Optional<Account> optionalAccount = Optional.ofNullable(accountRepository.findById(accountId));
         if (optionalAccount.isPresent()) {

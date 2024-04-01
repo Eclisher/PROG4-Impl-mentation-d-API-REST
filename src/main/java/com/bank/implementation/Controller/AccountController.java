@@ -7,8 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -61,14 +66,41 @@ public class AccountController {
     }
 
     @PutMapping("/accounts/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable("id") Long id, @RequestBody Account accountDetails) {
-        Account updatedAccount = accountService.updateAccount(id, accountDetails);
-        if (updatedAccount != null) {
-            return ResponseEntity.ok(updatedAccount);
-        } else {
+    public ResponseEntity<Account> updateAccount(@PathVariable("id") Long id, @RequestBody Map<String, Object> accountDetails) {
+        Optional<Account> existingAccountOptional = accountService.findById(id);
+
+        if (!existingAccountOptional.isPresent()) {
             return ResponseEntity.notFound().build();
         }
+
+        Account existingAccount = existingAccountOptional.get();
+
+        for (Map.Entry<String, Object> entry : accountDetails.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            try {
+                Field field = Account.class.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                if (value != null) {
+                    if (field.getType().equals(Date.class) && value instanceof String) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                        Date parsedDate = (Date) dateFormat.parse((String) value);
+                        field.set(existingAccount, parsedDate);
+                    } else {
+                        field.set(existingAccount, value);
+                    }
+                }
+            } catch (NoSuchFieldException | IllegalAccessException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Account updatedAccount = accountService.updateAccount(existingAccount);
+
+        return ResponseEntity.ok(updatedAccount);
     }
+
+
 
     @DeleteMapping("/accounts/{id}")
     public ResponseEntity<String> deleteAccountById(@PathVariable("id") Long accountId) {
@@ -125,8 +157,9 @@ public class AccountController {
         }
     }
 
+
     @PostMapping("/{accountId}/deposit")
-        public ResponseEntity<String> depositMoney(@PathVariable Long accountId, @RequestBody DepositRequest depositRequest) {
+    public ResponseEntity<String> depositMoney(@PathVariable Long accountId, @RequestBody DepositRequest depositRequest) {
         try {
             accountService.depositMoney(accountId, depositRequest.getAmount());
             return ResponseEntity.ok("Approvisionnement de solde effectué avec succès.");
@@ -134,6 +167,5 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors de l'approvisionnement de solde.");
         }
     }
-
 }
 

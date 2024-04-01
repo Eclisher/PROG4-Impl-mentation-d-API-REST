@@ -162,14 +162,61 @@ public class AccountRepository {
         }
     }
 
-    public Account update(Account account) {
-        String query = "UPDATE Account SET accountNumber = ?, clientLastName = ?, clientFirstName = ?, " +
-                "password = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, " +
-                "modificationDate = ?, overdraftEnabled = ?, overdraftLimit = ?, " +
-                "interestRateInitial = ?, interestRateSubsequent = ?, maxOverdraftDays = ? , balance = ? " +
-                "WHERE accountId = ?";
+        public Account update(Account account) {
+            String query = "UPDATE Account SET accountNumber = ?, clientLastName = ?, clientFirstName = ?, " +
+                    "password = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, " +
+                    "modificationDate = ?, overdraftEnabled = ?, overdraftLimit = ?, " +
+                    "interestRateInitial = ?, interestRateSubsequent = ?, maxOverdraftDays = ? , balance = ? " +
+                    "WHERE accountId = ?";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, account.getAccountNumber());
+                preparedStatement.setString(2, account.getClientLastName());
+                preparedStatement.setString(3, account.getClientFirstName());
+                preparedStatement.setString(4, account.getPassword());
+                if (account.getClientDateOfBirth() != null) {
+                    preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
+                } else {
+                    preparedStatement.setNull(5, Types.DATE);
+                }
+                preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
+                preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+                preparedStatement.setBoolean(8, account.isOverdraftEnabled());
+                preparedStatement.setBigDecimal(9, account.getOverdraftLimit());
+                preparedStatement.setBigDecimal(10, account.getInterestRateInitial());
+                preparedStatement.setBigDecimal(11, account.getInterestRateSubsequent());
+                preparedStatement.setInt(12, account.getMaxOverdraftDays());
+                preparedStatement.setLong(13, account.getAccountID());
+                preparedStatement.setBigDecimal(14, account.getBalance());
+                int rowsUpdated = preparedStatement.executeUpdate();
+                if (rowsUpdated > 0) {
+                    return account;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    public Account saveOrUpdateAccount(Account account) {
+        String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
+                "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
+                "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT (clientLastName, clientFirstName, clientDateOfBirth) " +
+                "DO UPDATE SET " +
+                "accountNumber = EXCLUDED.accountNumber, " +
+                "password = EXCLUDED.password, " +
+                "monthlyNetSalary = EXCLUDED.monthlyNetSalary, " +
+                "modificationDate = EXCLUDED.modificationDate, " +
+                "overdraftEnabled = EXCLUDED.overdraftEnabled, " +
+                "overdraftLimit = EXCLUDED.overdraftLimit, " +
+                "interestRateInitial = EXCLUDED.interestRateInitial, " +
+                "interestRateSubsequent = EXCLUDED.interestRateSubsequent, " +
+                "maxOverdraftDays = EXCLUDED.maxOverdraftDays, " +
+                "balance = EXCLUDED.balance";
+
         try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, account.getAccountNumber());
             preparedStatement.setString(2, account.getClientLastName());
             preparedStatement.setString(3, account.getClientFirstName());
@@ -181,21 +228,28 @@ public class AccountRepository {
             }
             preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
             preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
-            preparedStatement.setBoolean(8, account.isOverdraftEnabled());
-            preparedStatement.setBigDecimal(9, account.getOverdraftLimit());
-            preparedStatement.setBigDecimal(10, account.getInterestRateInitial());
-            preparedStatement.setBigDecimal(11, account.getInterestRateSubsequent());
-            preparedStatement.setInt(12, account.getMaxOverdraftDays());
-            preparedStatement.setLong(13, account.getAccountID());
+            preparedStatement.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
+            preparedStatement.setBoolean(9, account.isOverdraftEnabled());
+            preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
+            preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
+            preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
+            preparedStatement.setLong(13, account.getMaxOverdraftDays());
             preparedStatement.setBigDecimal(14, account.getBalance());
-            int rowsUpdated = preparedStatement.executeUpdate();
-            if (rowsUpdated > 0) {
-                return account;
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                ResultSet rs = preparedStatement.getGeneratedKeys();
+                if (rs.next()) {
+                    int accountId = rs.getInt(1);
+                    account.setAccountID(accountId);
+                    return account;
+                }
             }
+            return null;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
 }
