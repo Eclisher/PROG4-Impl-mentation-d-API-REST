@@ -331,6 +331,84 @@ paths:
                 - balanceId: "abc123"
                   accountId: "xyz789"
                   currentBalance: 1000.0
+
+    put:
+      summary: Create or update balances
+      description: This endpoint is used to create or update existing balances. It accepts an array of balance details and updates the corresponding balances in the database.
+      tags:
+        - Balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/balance'
+            example:
+              - amount: 1000.0
+                balanceDatetime: "2023-04-01T10:00:00Z"
+                idAccount: "abc123"
+      responses:
+        '200':
+          description: Successfully created or updated balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/balance'
+              example:
+                - amount: 1000.0
+                  balanceDatetime: "2023-04-01T10:00:00Z"
+                  idAccount: "abc123"
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /balance/{balanceId}:
+    get:
+      summary: Retrieve a balance by its ID
+      operationId: getBalanceById
+      tags:
+        - Balance
+      parameters:
+        - in: path
+          name: balanceId
+          required: true
+          schema:
+            type: string
+          description: The ID of the balance to retrieve
+      responses:
+        200:
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balance'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    delete:
+      summary: Delete a balance
+      tags:
+        - Balance
+      parameters:
+        - in: path
+          name: balanceId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/schemas/balance'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
 components:
   schemas:
     Account:
