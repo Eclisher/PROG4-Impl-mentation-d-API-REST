@@ -409,8 +409,94 @@ paths:
           $ref: '#/components/responses/SpecificResponse400'
         500:
           $ref: '#/components/responses/SpecificResponse500'
+
+  /transfer:
+    get:
+      summary: Retrieve all transfers
+      operationId: getAllTransfers
+      tags:
+        - Transfer
+      responses:
+        200:
+          description: List of transfers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transfer'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    put:
+      summary: Create or update transfers
+      operationId: saveOrUpdateTransfer
+      tags:
+        - Transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transfer'
+      responses:
+        200:
+          description: Transfer saved or updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
 components:
   schemas:
+    Transfer:
+      type: object
+      properties:
+        idTransfer:
+          type: string
+        reason:
+          type: string
+          description: The reason for the transfer.
+        idTransferGroup:
+          type: string
+        transaction:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+      required:
+        - reason
+
+    Transaction:
+      type: object
+      properties:
+        idTransaction:
+          type: string
+          description: The unique id of the transaction.
+        transactionType:
+          type: string
+          enum:
+            - EXPENSE
+            - INCOME
+          description: The type of the transaction.
+        amount:
+          type: number
+          format: double
+          description: The amount of the transaction.
+        transactionDateTime:
+          type: string
+          format: date-time
+          description: The date and time of the transaction.
+        reason:
+          type: string
+          description: reason of the transaction
+      required:
+        - transactionType
+        - amount
+        - reason
+        - transactionCategory
+
     Account:
       type: object
       properties:
@@ -458,14 +544,7 @@ components:
           description: amount of the balance.
         balanceDatetime:
           type: string
-          format: date-time
-          description: The date and time of the balance.
-        idAccount:
-          type: string
-          description: id account associated with this balance.
-      required:
-        - idAccount
-
+          format: date-time    
   responses:
     DefaultResponse:
       description: Default responses
@@ -483,7 +562,6 @@ components:
                     type: string
               body:
                 type: object
-
     SpecificResponse400:
       description: Bad Request
       content:
