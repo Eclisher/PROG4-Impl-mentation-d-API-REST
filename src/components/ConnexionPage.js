@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import './ConnexionPage.css'; 
 import { useNavigate } from 'react-router-dom'; 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGooglePlusG, faFacebookF, faGithub, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios';
 
 function ConnexionPage() {
