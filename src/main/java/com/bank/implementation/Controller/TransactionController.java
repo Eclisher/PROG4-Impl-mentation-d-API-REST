@@ -1,6 +1,7 @@
 package com.bank.implementation.Controller;
 
 import com.bank.implementation.Model.Transaction;
+import com.bank.implementation.Repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.bank.implementation.Service.TransactionService;
@@ -19,19 +20,22 @@ public class TransactionController {
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @PostMapping("/create")
     public void createTransaction(@RequestBody Transaction transaction) {
-        transactionService.createTransaction(
+        transactionRepository.createTransaction(
                 transaction.getTransactionDateTime(),
                 transaction.getAmount(),
                 transaction.getTransactionType(),
                 transaction.getReason(),
                 transaction.getEffectDate(),
-                transaction.getStatus()
+                transaction.getStatus(),
+                transaction.getAccountId(),
+                transaction.getCategoryId()
         );
     }
-
     @GetMapping("/all")
     public List<Transaction> getAllTransactions() {
         return transactionService.getAllTransactions();

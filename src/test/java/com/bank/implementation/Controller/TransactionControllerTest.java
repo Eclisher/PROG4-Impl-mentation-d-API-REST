@@ -42,7 +42,9 @@ class TransactionControllerTest {
                 transaction.getTransactionType(),
                 transaction.getReason(),
                 transaction.getEffectDate(),
-                transaction.getStatus()
+                transaction.getStatus(),
+                transaction.getAccountId(),
+                transaction.getCategoryId()
         );
     }
 

@@ -20,8 +20,8 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public void createTransaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, String status) {
-        transactionRepository.createTransaction(transactionDateTime, amount, transactionType, reason, effectDate, status);
+    public void createTransaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, String status , Long AccountId, Long CategoryId) {
+        transactionRepository.createTransaction(transactionDateTime, amount, transactionType, reason, effectDate, status,AccountId,CategoryId);
     }
 
     public List<Transaction> getAllTransactions() {

@@ -1,0 +1,53 @@
+{
+  "info": {
+    "_postman_id": "7f5aa966-ec26-4e64-8441-27f11d22e7fd",
+    "name": "Transactions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Transaction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"transactionDateTime\": \"2024-04-01T08:00:00\",\n    \"amount\": 1000.00,\n    \"transactionType\": \"credit\",\n    \"reason\": \"Deposit\",\n    \"effectDate\": \"2024-04-01T08:00:00\",\n    \"status\": \"completed\",\n    \"accountId\": 6,\n    \"categoryId\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/transaction/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "transaction",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Transactions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/transaction/all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "transaction",
+            "all"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
