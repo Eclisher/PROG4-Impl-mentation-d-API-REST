@@ -1,16 +1,20 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/HomePage'; 
-import ConnexionPage from './components/ConnexionPage'; 
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import MainLayout from "./layout/MainLayout";
+import Blank from "./pages/Blank";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/homepage" element={<HomePage />} />
-        <Route path="/" element={<ConnexionPage />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<Blank />} />
+        <Route path="removal" element={<MainLayout />} />
+        <Route path="balance" element={<Blank />} />
+        <Route path="provisioning" element={<Blank />} />
+        <Route path="transfer" element={<Dashboard />} />
+      </Route>
+    </Routes>
   );
 }
 
