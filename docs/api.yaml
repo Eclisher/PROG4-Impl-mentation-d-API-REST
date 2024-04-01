@@ -449,6 +449,54 @@ paths:
           $ref: '#/components/responses/SpecificResponse400'
         500:
           $ref: '#/components/responses/SpecificResponse500'
+  /transfer/{transferId}:
+    get:
+      summary: Retrieve a transfer by its ID
+      operationId: getTransferById
+      tags:
+        - Transfer
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the transfer to retrieve
+      responses:
+        200:
+          description: Transfer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a transfer by its ID
+      operationId: deleteTransferById
+      tags:
+        - Transfer
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the transfer to delete
+      responses:
+        200:
+          description: Transfer deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
 components:
   schemas:
     Transfer:
