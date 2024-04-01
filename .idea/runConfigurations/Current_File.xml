@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Current File" type="Application" factoryName="Application">
+    <envs>
+      <env name="DB_URL" value="jdbc:postgresql://localhost:5432/banks" />
+      <env name="DB_USER" value="postgres" />
+      <env name="DB_PASSWORD" value="harizo123" />
+    </envs>
+    <module name="implementation" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

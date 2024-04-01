@@ -1,0 +1,945 @@
+openapi: "3.0.3"
+info:
+  title: Bank of Mada
+  version: "1.0"
+servers:
+  - url: https://bankOfMada.com
+tags:
+- name: Account
+- name: Transaction
+- name: Balance
+- name: Category
+- name: Transfer
+- name: Statement
+- name: Dashboard
+
+paths:
+  /accounts:
+    get:
+      tags:
+        - "Account"
+      summary: Retrieve account list
+      operationId: getAccounts
+      responses:
+        200:
+          description: Successfully retrieve the account list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+              example:
+                - id: "123456"
+                  firstName: "John"
+                  lastName: "Doe"
+                  dateOfBirth: "1990-05-15"
+                  monthlySalary: 2500.0
+                  accountNumber: "ABC123456789"
+                - id: "789012"
+                  firstName: "Alice"
+                  lastName: "Smith"
+                  dateOfBirth: "1985-10-20"
+                  monthlySalary: 3000.0
+                  accountNumber: "XYZ789012345"
+
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    post:
+      tags:
+        - "Account"
+      summary: Create a new bank account
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientLastName:
+                    type: string
+                  clientFirstName:
+                    type: string
+                  clientDateOfBirth:
+                    type: string
+                    format: date
+                  monthlyNetSalary:
+                    type: number
+                  accountNumber:
+                    type: string
+      responses:
+          '201':
+            description: Account created successfully
+          400:
+            $ref: '#/components/responses/SpecificResponse400'
+          403:
+            $ref: '#/components/responses/SpecificResponse403'
+          500:
+            $ref: '#/components/responses/SpecificResponse500'
+
+  /accounts/{accountId}:
+    get:
+      tags:
+        - "Account"
+      summary: Get details of a specific account
+      operationId: getAccountDetails
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          description: Account ID to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Account details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+              example:
+                id: "123456"
+                firstName: "John"
+                lastName: "Doe"
+                dateOfBirth: "1990-05-15"
+                monthlySalary: 2500.0
+                accountNumber: "ABC123456789"
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    put:
+      tags:
+        - "Account"
+      summary: Modify account informations
+      operationId: updateAccount
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          description: Account ID to be modified
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          description: Account successfully modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+              example:
+                id: "123456"
+                firstName: "John"
+                lastName: "Doe"
+                dateOfBirth: "1990-05-15"
+                monthlySalary: 3000.0
+                accountNumber: "ABC123456789"
+
+        400:
+          $ref: '#/components/responses'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    delete:
+      tags:
+        - "Account"
+      summary: Delete an account
+      operationId: deleteAccount
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          description: Account ID to be deleted
+          schema:
+            type: string
+      responses:
+        200:
+          description: Account successfully deleted
+        400:
+          $ref: '#/components/responses'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /accounts/{accountId}/withdrawals:
+    post:
+      tags:
+        - "Account"
+      summary: Making a withdrawal from an account
+      operationId: makeWithdrawal
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          description: Account ID for withdrawal
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawalRequest'
+      responses:
+        '200':
+          description: Withdrawal successfully completed
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /accounts/{accountId}/balance:
+    get:
+      tags:
+        - "Account"
+      summary: Obtain account balance
+      operationId: getAccountBalance
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          description: Account ID for balance
+          schema:
+            type: string
+      responses:
+        200:
+          description: Account balance successfully recovered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+              example:
+                id: "123456"
+                firstName: "John"
+                lastName: "Doe"
+                dateOfBirth: "1990-05-15"
+                monthlySalary: 2500.0
+                accountNumber: "ABC123456789"
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /transaction:
+    get:
+      summary: Retrieve all transactions
+      operationId: getAllTransactions
+      tags:
+        - Transaction
+      responses:
+        '200':
+          description: List of transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '500':
+          $ref: '#/components/responses/SpecificResponse500'
+    put:
+      tags:
+        - "Transaction"
+      summary: Categorize a banking transaction
+      operationId: categorizeTransaction
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          description: ID of banking operation to be categorized
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  type: string
+                comment:
+                  type: string
+      responses:
+        200:
+          description: Banking operation successfully categorized
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /transaction/{id}:
+    get:
+      summary: Retrieve a transaction by its ID
+      operationId: getTransactionById
+      tags:
+        - Transaction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction to retrieve
+      responses:
+        200:
+          description: Transaction retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a transaction by its ID
+      operationId: deleteTransactionById
+      tags:
+        - Transaction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction to delete
+      responses:
+        200:
+          description: Transaction deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /category: 
+    get:
+      summary: Retrieve all categories of transaction
+      operationId: getAllTransactionCategory
+      tags:
+        - Category
+      responses:
+        200:
+          description: List of transaction categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    put:
+      summary: Create or update transaction categories
+      operationId: createOrUpdateTransactionCategory
+      tags:
+        - Category
+      requestBody:
+        required: true
+        description: If an id was provided , the categories of transaction will be updated
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+      responses:
+        200:
+          description: Transaction category created or updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /transaction-category/{id}:
+    get:
+      summary: Retrieve a transaction category by its ID
+      operationId: getTransactionCategoryById
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction category to retrieve
+      responses:
+        200:
+          description: Transaction category retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    delete:
+      summary: Delete a transaction category by its ID
+      operationId: deleteTransactionCategoryById
+      tags:
+        - Category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction category to delete
+      responses:
+        200:
+          description: Transaction category deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /dashboard:
+    get:
+      tags:
+        - "Dashboard"
+      summary: Get the customer's dashboard
+      operationId: getClientDashboard
+      parameters:
+        - in: query
+          name: period
+          required: false
+          description: "Period for which to obtain the dashboard (default: month)"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer dashboard successfully recovered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categoryPieChart:
+                    type: object
+                    additionalProperties:
+                      type: number
+                    example:
+                      Food: 300
+                      Hobbies: 150
+                      Others: 50
+                  incomeVsExpenseChart:
+                    type: object
+                    properties:
+                      income:
+                        type: number
+                      expense:
+                        type: number
+                    example:
+                      income: 1000
+                      expense: 500
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /balance: 
+    get:
+      summary: Retrieve all balances
+      tags:
+        - Balance
+      responses:
+        200:
+          description: Successfully got all balances
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/balance'
+                example:
+                - balanceId: "abc123"
+                  accountId: "xyz789"
+                  currentBalance: 1000.0
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    put:
+      summary: Create or update balances
+      description: This endpoint is used to create or update existing balances. It accepts an array of balance details and updates the corresponding balances in the database.
+      tags:
+        - Balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/balance'
+            example:
+              - amount: 1000.0
+                balanceDatetime: "2023-04-01T10:00:00Z"
+                idAccount: "abc123"
+      responses:
+        200:
+          description: Successfully created or updated balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/balance'
+              example:
+                - amount: 1000.0
+                  balanceDatetime: "2023-04-01T10:00:00Z"
+                  idAccount: "abc123"
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /balance/{balanceId}:
+    get:
+      summary: Retrieve a balance by its ID
+      operationId: getBalanceById
+      tags:
+        - Balance
+      parameters:
+        - in: path
+          name: balanceId
+          required: true
+          schema:
+            type: string
+          description: The ID of the balance to retrieve
+      responses:
+        200:
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balance'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+    delete:
+      summary: Delete a balance
+      tags:
+        - Balance
+      parameters:
+        - in: path
+          name: balanceId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/schemas/balance'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /transfer:
+    get:
+      summary: Retrieve all transfers
+      operationId: getAllTransfers
+      tags:
+        - Transfer
+      responses:
+        200:
+          description: List of transfers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transfer'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    put:
+      summary: Create or update transfers
+      operationId: saveOrUpdateTransfer
+      tags:
+        - Transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transfer'
+      responses:
+        200:
+          description: Transfer saved or updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /transfer/{transferId}:
+    get:
+      summary: Retrieve a transfer by ID
+      operationId: getTransferById
+      tags:
+        - Transfer
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the transfer to retrieve
+      responses:
+        200:
+          description: Transfer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a transfer by ID
+      operationId: deleteTransferById
+      tags:
+        - Transfer
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the transfer to delete
+      responses:
+        200:
+          description: Transfer deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+
+  /statement:
+    get:
+      summary: Retrieve all statement 
+      operationId: getAllStatement
+      tags:
+        - Statement
+      responses:
+        200:
+          description: List of all statement retrivied successfully
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500' 
+
+    put:
+      summary: Create or update statement
+      operationId: createOrUpdateStatement
+      tags:
+        - Statement
+      requestBody: 
+        required: true 
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Statement'
+      responses:
+        200: 
+          description: Statement create or update successfully
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        403:
+          $ref: '#/components/responses/SpecificResponse403'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+  /statement/{statementId}:
+    get:
+      summary: Retrieve a statement by ID
+      operationId: getStatementById
+      tags:
+        - Statement
+      parameters:
+        - in: path
+          name: StatementId
+          required: true
+          schema:
+            type: string
+          description: The ID of the statement to retrieve
+      responses:
+        200:
+          description: Statement retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+    delete:
+      summary: Delete a statement by ID
+      operationId: deleteTransferById
+      tags:
+        - Statement
+      parameters:
+        - in: path
+          name: transferId
+          required: true
+          schema:
+            type: string
+          description: The ID of the statement to delete
+      responses:
+        200:
+          description: Statement deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statement'
+        400:
+          $ref: '#/components/responses/SpecificResponse400'
+        500:
+          $ref: '#/components/responses/SpecificResponse500'
+components:
+  schemas:
+    Transfer:
+      type: object
+      properties:
+        idTransfer:
+          type: string
+        reason:
+          type: string
+          description: The reason for the transfer.
+        idTransferGroup:
+          type: string
+        transaction:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+      required:
+        - reason
+
+    Transaction:
+      type: object
+      properties:
+        idTransaction:
+          type: string
+          description: The unique id of the transaction.
+        transactionType:
+          type: string
+          enum:
+            - EXPENSE
+            - INCOME
+          description: The type of the transaction.
+        amount:
+          type: number
+          format: double
+          description: The amount of the transaction.
+        transactionDateTime:
+          type: string
+          format: date-time
+          description: The date and time of the transaction.
+        reason:
+          type: string
+          description: reason of the transaction
+      required:
+        - transactionType
+        - amount
+        - reason
+        - transactionCategory
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        monthlySalary:
+          type: number
+        accountNumber:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - dateOfBirth
+        - monthlySalary
+        - accountNumber
+
+    WithdrawalRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        dateTime:
+          type: string
+          format: date-time
+      required:
+        - amount
+        - dateTime
+
+    Statement: 
+      type: object
+      properties:
+        idStatement:
+          type: string
+          description: ID of statement
+        transaction: 
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    balance:
+      type: object
+      properties:
+        idBalance:
+          type: string
+          description: ID balance.
+        amount:
+          type: number
+          format: double
+          description: amount of the balance.
+        balanceDatetime:
+          type: string
+          format: date-time 
+    Category: 
+      type: object
+      properties:
+        idCategory:
+          type: string
+        name:
+          type: string
+        TransactionType:
+          type: string
+  responses:
+    DefaultResponse:
+      description: Default responses
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              body:
+                type: object
+    SpecificResponse400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/responses/DefaultResponse'
+              - type: object
+              - properties:
+                  status:
+                    properties:
+                      code:
+                        default: 400
+                      message:
+                        default: "Bad Request"
+                  body:
+                    example: { }
+
+
+    SpecificResponse403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/responses/DefaultResponse'
+              - type: object
+              - properties:
+                  status:
+                    type: object
+                    properties:
+                      code:
+                        default: 403
+                      message:
+                        default: "Forbidden"
+                  body:
+                    example: {}
+    SpecificResponse500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/responses/DefaultResponse'
+              - type: object
+              - properties:
+                  status:
+                    properties:
+                      code:
+                        default: 500
+                      message:
+                        default: "Internal Server Error"
+                  body:
+                    example: {}
