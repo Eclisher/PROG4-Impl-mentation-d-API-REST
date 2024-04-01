@@ -314,6 +314,23 @@ paths:
           $ref: '#/components/responses/SpecificResponse403'
         500:
           $ref: '#/components/responses/SpecificResponse500'
+  /balance: 
+    get:
+      summary: Retrieve all balances
+      tags:
+        - Balance
+      responses:
+        '200':
+          description: Successfully got all balances
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/balance'
+                example:
+                - balanceId: "abc123"
+                  accountId: "xyz789"
+                  currentBalance: 1000.0
 components:
   schemas:
     Account:
@@ -350,6 +367,26 @@ components:
       required:
         - amount
         - dateTime
+
+    balance:
+      type: object
+      properties:
+        idBalance:
+          type: string
+          description: ID balance.
+        amount:
+          type: number
+          format: double
+          description: amount of the balance.
+        balanceDatetime:
+          type: string
+          format: date-time
+          description: The date and time of the balance.
+        idAccount:
+          type: string
+          description: id account associated with this balance.
+      required:
+        - idAccount
 
   responses:
     DefaultResponse:
