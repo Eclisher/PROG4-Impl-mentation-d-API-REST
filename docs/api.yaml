@@ -9,11 +9,11 @@
       get:
         tags:
           - "Account"
-        summary: Récupérer la liste des comptes
+        summary: Retrieve account list
         operationId: getAccounts
         responses:
           200:
-            description: Récupérer la liste des comptes avec succès
+            description: Successfully retrieve the account list
             content:
               application/json:
                 schema:
@@ -44,7 +44,7 @@
       post:
         tags:
           - "Account"
-        summary: Créer un nouveau compte bancaire
+        summary: Create a new bank account
         requestBody:
             required: true
             content:
@@ -65,7 +65,7 @@
                       type: string
         responses:
             '201':
-              description: Compte créé avec succès
+              description: Account created successfully
             400:
               $ref: '#/components/responses/SpecificResponse400'
             403:
@@ -77,18 +77,18 @@
       get:
         tags:
           - "Account"
-        summary: Obtenir les détails d'un compte spécifique
+        summary: Get details of a specific account
         operationId: getAccountDetails
         parameters:
           - in: path
             name: accountId
             required: true
-            description: ID du compte à récupérer
+            description: Account ID to retrieve
             schema:
               type: string
         responses:
           200:
-            description: Détails du compte récupérés avec succès
+            description: Account details successfully retrieved
             content:
               application/json:
                 schema:
@@ -110,13 +110,13 @@
       put:
         tags:
           - "Account"
-        summary: Modifier les informations d'un compte
+        summary: Modify account informations
         operationId: updateAccount
         parameters:
           - in: path
             name: accountId
             required: true
-            description: ID du compte à modifier
+            description: Account ID to be modified
             schema:
               type: string
         requestBody:
@@ -127,7 +127,7 @@
                 $ref: '#/components/schemas/Account'
         responses:
           200:
-            description: Compte modifié avec succès
+            description: Account successfully modified
             content:
               application/json:
                 schema:
@@ -150,18 +150,18 @@
       delete:
         tags:
           - "Account"
-        summary: Supprimer un compte
+        summary: Delete an account
         operationId: deleteAccount
         parameters:
           - in: path
             name: accountId
             required: true
-            description: ID du compte à supprimer
+            description: Account ID to be deleted
             schema:
               type: string
         responses:
           200:
-            description: Compte supprimé avec succès
+            description: Account successfully deleted
           400:
             $ref: '#/components/responses'
           403:
@@ -173,13 +173,13 @@
       post:
         tags:
           - "Account"
-        summary: Effectuer un retrait sur un compte
+        summary: Making a withdrawal from an account
         operationId: makeWithdrawal
         parameters:
           - in: path
             name: accountId
             required: true
-            description: ID du compte pour le retrait
+            description: Account ID for withdrawal
             schema:
               type: string
         requestBody:
@@ -190,7 +190,7 @@
                 $ref: '#/components/schemas/WithdrawalRequest'
         responses:
           '200':
-            description: Retrait effectué avec succès
+            description: Withdrawal successfully completed
           400:
             $ref: '#/components/responses/SpecificResponse400'
           403:
@@ -202,18 +202,18 @@
       get:
         tags:
           - "Account"
-        summary: Obtenir le solde d'un compte
+        summary: Obtain account balance
         operationId: getAccountBalance
         parameters:
           - in: path
             name: accountId
             required: true
-            description: ID du compte pour le solde
+            description: Account ID for balance
             schema:
               type: string
         responses:
           200:
-            description: Solde du compte récupéré avec succès
+            description: Account balance successfully recovered
             content:
               application/json:
                 schema:
@@ -236,13 +236,13 @@
       put:
         tags:
           - "Transaction"
-        summary: Catégoriser une opération bancaire
+        summary: Categorize a banking transaction
         operationId: categorizeTransaction
         parameters:
           - in: path
             name: transactionId
             required: true
-            description: ID de l'opération bancaire à catégoriser
+            description: ID of banking operation to be categorized
             schema:
               type: string
         requestBody:
@@ -258,7 +258,7 @@
                     type: string
         responses:
           '200':
-            description: Opération bancaire catégorisée avec succès
+            description: Banking operation successfully categorized
           400:
             $ref: '#/components/responses/SpecificResponse400'
           403:
@@ -269,18 +269,18 @@
       get:
         tags:
           - "Dashboard"
-        summary: Obtenir le tableau de bord du client
+        summary: Get the customer's dashboard
         operationId: getClientDashboard
         parameters:
           - in: query
             name: period
             required: false
-            description: "Période pour laquelle obtenir le tableau de bord (par défaut: mois)"
+            description: "Period for which to obtain the dashboard (default: month)"
             schema:
               type: string
         responses:
           '200':
-            description: Tableau de bord du client récupéré avec succès
+            description: Customer dashboard successfully recovered
             content:
               application/json:
                 schema:
