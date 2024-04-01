@@ -30,6 +30,30 @@
       "response": []
     },
     {
+      "name": "Create deposit transaction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 1000,\n    \"transactionType\": \"credit\",\n    \"reason\": \"Deposit\",\n    \"effectDate\": \"2024-04-01T08:00:00\",\n    \"accountId\": 6\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/transaction/deposit",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "transaction",
+            "deposit"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Get All Transactions",
       "request": {
         "method": "GET",

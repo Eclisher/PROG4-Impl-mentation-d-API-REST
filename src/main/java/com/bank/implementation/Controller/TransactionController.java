@@ -24,7 +24,7 @@ public class TransactionController {
     private TransactionRepository transactionRepository;
 
     @PostMapping("/create")
-    public void createTransaction(@RequestBody Transaction transaction) {
+    public String createTransaction(@RequestBody Transaction transaction) {
         transactionRepository.createTransaction(
                 transaction.getTransactionDateTime(),
                 transaction.getAmount(),
@@ -35,6 +35,7 @@ public class TransactionController {
                 transaction.getAccountId(),
                 transaction.getCategoryId()
         );
+        return "Transaction created successfully";
     }
     @GetMapping("/all")
     public List<Transaction> getAllTransactions() {
@@ -47,13 +48,14 @@ public class TransactionController {
     }
 
     @PostMapping("/deposit")
-    public void createDepositTransaction(@RequestBody Transaction transaction) {
+    public String createDepositTransaction(@RequestBody Transaction transaction) {
         transactionService.createDepositTransaction(
                 transaction.getAmount(),
                 transaction.getReason(),
                 transaction.getEffectDate(),
                 transaction.getAccountId()
         );
+        return "Deposit Transaction created successfully";
     }
 }
 
