@@ -8,7 +8,10 @@ tags:
 - name: Account
 - name: Transaction
 - name: Balance
-- name: Transaction
+- name: Category
+- name: Transfer
+- name: Statement
+- name: Dashboard
 
 paths:
   /accounts:
@@ -279,7 +282,7 @@ paths:
                 comment:
                   type: string
       responses:
-        '200':
+        200:
           description: Banking operation successfully categorized
         400:
           $ref: '#/components/responses/SpecificResponse400'
@@ -325,15 +328,15 @@ paths:
             type: string
           description: The ID of the transaction to delete
       responses:
-        '200':
+        200:
           description: Transaction deleted successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
-        '400':
+        400:
           $ref: '#/components/responses/SpecificResponse400'
-        '500':
+        500:
           $ref: '#/components/responses/SpecificResponse500'
   /category: 
     get:
@@ -415,15 +418,15 @@ paths:
             type: string
           description: The ID of the transaction category to delete
       responses:
-        '200':
+        200:
           description: Transaction category deleted successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Category'
-        '400':
+        400:
           $ref: '#/components/responses/SpecificResponse400'
-        '500':
+        500:
           $ref: '#/components/responses/SpecificResponse500'
   /dashboard:
     get:
