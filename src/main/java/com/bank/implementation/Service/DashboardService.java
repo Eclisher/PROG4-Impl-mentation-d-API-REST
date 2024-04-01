@@ -21,15 +21,15 @@ public class DashboardService {
     public DashboardData generateDashboardData() {
         DashboardData dashboardData = new DashboardData();
 
-        // Exemple 1 : Somme des montants par catégorie dans une période donnée
+        // Example 1: Sum of amounts by category for a given period
         Map<String, BigDecimal> categoryAmounts = transactionService.getCategoryAmountsInPeriod(LocalDate.now().minusMonths(1).atStartOfDay(), LocalDate.now().atStartOfDay());
         dashboardData.setCategoryAmounts(categoryAmounts);
 
-        // Exemple 2 : Somme des dépenses dans une période donnée
+        // Example 2: Sum of expenses in a given period
         BigDecimal totalExpenses = transactionService.getTotalExpensesInPeriod(LocalDate.now().minusMonths(1).atStartOfDay(), LocalDate.now().atStartOfDay());
         dashboardData.setTotalExpenses(totalExpenses);
 
-        // Exemple 3 : Somme des rentrées d'argent dans une période donnée
+        // Example 3: Sum of cash inflows over a given period
         BigDecimal totalIncome = transactionService.getTotalIncomeInPeriod(LocalDate.now().minusMonths(1).atStartOfDay(), LocalDate.now().atStartOfDay());
         dashboardData.setTotalIncome(totalIncome);
 
