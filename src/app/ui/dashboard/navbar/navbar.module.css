@@ -1,0 +1,42 @@
+.container {
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #009944;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  color: #ffffff;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: "Arial", sans-serif;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.input {
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+}
+
+.icons {
+  display: flex;
+  gap: 20px;
+  color: #ffff;
+}

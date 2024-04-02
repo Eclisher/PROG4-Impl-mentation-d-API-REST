@@ -1,0 +1,23 @@
+.container{
+    position: sticky;
+    top: 40px;
+    background-color: #009944;  
+}
+
+.list{
+    list-style: none;
+    color : #ffff;
+}
+
+.cat{
+    color: var(--textSoft);
+    font-weight: bold;
+    font-size: 20px;
+    margin: 10px 0px;
+}
+.title{
+    font-size: 30px;
+    font-family: comic sans MS;
+    color : #ffff;
+}
+

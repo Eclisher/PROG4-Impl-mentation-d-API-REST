@@ -1,0 +1,53 @@
+.container {
+  background: linear-gradient(to right, #046630bc 0%, #0c5a2c 100%);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  font-size: large;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-weight: 500;
+  color: var(--textSoft);
+}
+
+.table {
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.section input,
+.section select {
+  padding: 20px;
+  width: 100%;
+  background-color: transparent;
+  color: var(--text);
+  border: 2px solid #2e374a;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.form button {
+  background-color: teal;
+  color: var(--text);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 45%;
+  height: 7vh;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  width: 75%;
+}
+
+.section button {
+  margin-top: 1vh;
+}
