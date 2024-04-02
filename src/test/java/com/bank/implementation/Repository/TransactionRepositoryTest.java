@@ -31,7 +31,7 @@ public class TransactionRepositoryTest {
         Long categoryId = 1L;
 
         // save the transaction in DB
-        transactionRepository.createTransaction(transactionDateTime, amount, transactionType, reason, effectDate, status, accountId, categoryId);
+        transactionRepository.createTransaction(transactionDateTime, BigDecimal.valueOf(amount), transactionType, reason, effectDate, status, accountId, categoryId);
 
         // Get all TRa,sactin
         List<Transaction> transactions = transactionRepository.getAllTransactions();
@@ -56,8 +56,8 @@ public class TransactionRepositoryTest {
         LocalDateTime endDate = LocalDateTime.now();
 
 
-        transactionRepository.createTransaction(LocalDateTime.now(), 50.00, "expense", "Groceries", LocalDateTime.now(), "completed", 1L, 1L);
-        transactionRepository.createTransaction(LocalDateTime.now().minusDays(5), 100.00, "expense", "Electronics", LocalDateTime.now(), "completed", 1L, 2L);
+        transactionRepository.createTransaction(LocalDateTime.now(), BigDecimal.valueOf(50.00), "expense", "Groceries", LocalDateTime.now(), "completed", 1L, 1L);
+        transactionRepository.createTransaction(LocalDateTime.now().minusDays(5), BigDecimal.valueOf(100.00), "expense", "Electronics", LocalDateTime.now(), "completed", 1L, 2L);
 
 
         List<Transaction> transactions = transactionRepository.getTransactionsInDateRange(startDate, endDate);
@@ -78,7 +78,7 @@ public class TransactionRepositoryTest {
         Long accountId = 1L;
 
 
-        transactionRepository.createDepositTransaction(amount, reason, effectDate, accountId);
+        transactionRepository.createDepositTransaction(BigDecimal.valueOf(amount), reason, effectDate, accountId);
 
 
         List<Transaction> transactions = transactionRepository.getAllTransactions();
@@ -96,7 +96,7 @@ public class TransactionRepositoryTest {
     @Test
     public void testUpdateTransactionCategory() {
 
-        transactionRepository.createTransaction(LocalDateTime.now(), 100.00, "expense", "Shopping", LocalDateTime.now(), "completed", 1L, 1L);
+        transactionRepository.createTransaction(LocalDateTime.now(), BigDecimal.valueOf(100.00), "expense", "Shopping", LocalDateTime.now(), "completed", 1L, 1L);
 
 
         List<Transaction> transactions = transactionRepository.getAllTransactions();

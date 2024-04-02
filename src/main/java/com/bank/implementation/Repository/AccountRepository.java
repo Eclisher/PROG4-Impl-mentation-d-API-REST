@@ -28,148 +28,13 @@ public class AccountRepository {
 
 
 
-    public Account save(Account account) {
-        String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
-                "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
-                "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, account.getAccountNumber());
-            preparedStatement.setString(2, account.getClientLastName());
-            preparedStatement.setString(3, account.getClientFirstName());
-            preparedStatement.setString(4, account.getPassword());
-            if (account.getClientDateOfBirth() != null) {
-                preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
-            } else {
-                preparedStatement.setNull(5, Types.DATE);
-            }
-            preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
-            preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
-            preparedStatement.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
-            preparedStatement.setBoolean(9, account.isOverdraftEnabled());
-            preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
-            preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
-            preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
-            preparedStatement.setLong(13, account.getAccountID());
-            preparedStatement.setBigDecimal(14, account.getBalance());
-
-
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
-                ResultSet rs = preparedStatement.getGeneratedKeys();
-                if (rs.next()) {
-                    int accountId = rs.getInt(1);
-                    account.setAccountID(accountId);
-                    return account;
-                }
-            }
-            return null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public List<Account> findAll() {
-        List<Account> accounts = new ArrayList<>();
-        String query = "SELECT * FROM Account";
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Account account = new Account();
-                account.setAccountID(resultSet.getInt(ACCOUNTID_COLUMN));
-                account.setAccountNumber(resultSet.getString(ACCOUNTNUMBER_COLUMN));
-                account.setClientLastName(resultSet.getString(CLIENTLASTNAME_COLUMN));
-                account.setClientFirstName(resultSet.getString(CLIENTFIRSTNAME_COLUMN));
-                account.setPassword(resultSet.getString(PASSWORD_COLUMN));
-                account.setClientDateOfBirth(resultSet.getDate(CLIENTDATEOFBIRTH_COLUMN));
-                account.setMonthlyNetSalary(resultSet.getBigDecimal(MONTHLYNETSALARY_COLUMN));
-                account.setCreationDate(resultSet.getTimestamp(CREATIONDATE_COLUMN));
-                account.setModificationDate(resultSet.getTimestamp(MODIFICATIONDATE_COLUMN));
-                account.setOverdraftEnabled(resultSet.getBoolean(OVERDRAFTENABLED_COLUMN));
-                account.setOverdraftLimit(resultSet.getBigDecimal(OVERDRAFTLIMIT_COLUMN));
-                account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
-                account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
-                account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
-                account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
-                accounts.add(account);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return accounts;
-    }
-    public List<Account> findByAccountNumberAndPassword(String accountNumber, String password) {
-        List<Account> accounts = new ArrayList<>();
-        String query = "SELECT * FROM Account WHERE accountNumber = ? AND password = ?";
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, accountNumber);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Account account = new Account();
-                accounts.add(account);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return accounts;
-    }
-
-    public Account findById(Long accountId) {
-        String query = "SELECT * FROM Account WHERE accountId = ?";
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, accountId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                Account account = new Account();
-                account.setAccountID(resultSet.getInt(ACCOUNTID_COLUMN));
-                account.setAccountNumber(resultSet.getString(ACCOUNTNUMBER_COLUMN));
-                account.setClientLastName(resultSet.getString(CLIENTLASTNAME_COLUMN));
-                account.setClientFirstName(resultSet.getString(CLIENTFIRSTNAME_COLUMN));
-                account.setPassword(resultSet.getString(PASSWORD_COLUMN));
-                account.setClientDateOfBirth(resultSet.getDate(CLIENTDATEOFBIRTH_COLUMN));
-                account.setMonthlyNetSalary(resultSet.getBigDecimal(MONTHLYNETSALARY_COLUMN));
-                account.setCreationDate(resultSet.getTimestamp(CREATIONDATE_COLUMN));
-                account.setModificationDate(resultSet.getTimestamp(MODIFICATIONDATE_COLUMN));
-                account.setOverdraftEnabled(resultSet.getBoolean(OVERDRAFTENABLED_COLUMN));
-                account.setOverdraftLimit(resultSet.getBigDecimal(OVERDRAFTLIMIT_COLUMN));
-                account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
-                account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
-                account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
-                account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
-                return account;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean deleteById(Long accountId) {
-        String query = "DELETE FROM Account WHERE accountId = ?";
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, accountId);
-            int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-        public Account update(Account account) {
-            String query = "UPDATE Account SET accountNumber = ?, clientLastName = ?, clientFirstName = ?, " +
-                    "password = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, " +
-                    "modificationDate = ?, overdraftEnabled = ?, overdraftLimit = ?, " +
-                    "interestRateInitial = ?, interestRateSubsequent = ?, maxOverdraftDays = ? , balance = ? " +
-                    "WHERE accountId = ?";
+        public Account save(Account account) {
+            String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
+                    "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
+                    "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (Connection connection = PostgresqlConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                 PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, account.getAccountNumber());
                 preparedStatement.setString(2, account.getClientLastName());
                 preparedStatement.setString(3, account.getClientFirstName());
@@ -181,15 +46,101 @@ public class AccountRepository {
                 }
                 preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
                 preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
-                preparedStatement.setBoolean(8, account.isOverdraftEnabled());
-                preparedStatement.setBigDecimal(9, account.getOverdraftLimit());
-                preparedStatement.setBigDecimal(10, account.getInterestRateInitial());
-                preparedStatement.setBigDecimal(11, account.getInterestRateSubsequent());
-                preparedStatement.setInt(12, account.getMaxOverdraftDays());
+                preparedStatement.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
+                preparedStatement.setBoolean(9, account.isOverdraftEnabled());
+                preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
+                preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
+                preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
                 preparedStatement.setLong(13, account.getAccountID());
                 preparedStatement.setBigDecimal(14, account.getBalance());
-                int rowsUpdated = preparedStatement.executeUpdate();
-                if (rowsUpdated > 0) {
+
+
+                int rowsInserted = preparedStatement.executeUpdate();
+                if (rowsInserted > 0) {
+                    ResultSet rs = preparedStatement.getGeneratedKeys();
+                    if (rs.next()) {
+                        int accountId = rs.getInt(1);
+                        account.setAccountID(accountId);
+                        return account;
+                    }
+                }
+                return null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        public List<Account> findAll() {
+            List<Account> accounts = new ArrayList<>();
+            String query = "SELECT * FROM Account";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Account account = new Account();
+                    account.setAccountID(resultSet.getInt(ACCOUNTID_COLUMN));
+                    account.setAccountNumber(resultSet.getString(ACCOUNTNUMBER_COLUMN));
+                    account.setClientLastName(resultSet.getString(CLIENTLASTNAME_COLUMN));
+                    account.setClientFirstName(resultSet.getString(CLIENTFIRSTNAME_COLUMN));
+                    account.setPassword(resultSet.getString(PASSWORD_COLUMN));
+                    account.setClientDateOfBirth(resultSet.getDate(CLIENTDATEOFBIRTH_COLUMN));
+                    account.setMonthlyNetSalary(resultSet.getBigDecimal(MONTHLYNETSALARY_COLUMN));
+                    account.setCreationDate(resultSet.getTimestamp(CREATIONDATE_COLUMN));
+                    account.setModificationDate(resultSet.getTimestamp(MODIFICATIONDATE_COLUMN));
+                    account.setOverdraftEnabled(resultSet.getBoolean(OVERDRAFTENABLED_COLUMN));
+                    account.setOverdraftLimit(resultSet.getBigDecimal(OVERDRAFTLIMIT_COLUMN));
+                    account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
+                    account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
+                    account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
+                    account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
+                    accounts.add(account);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return accounts;
+        }
+        public List<Account> findByAccountNumberAndPassword(String accountNumber, String password) {
+            List<Account> accounts = new ArrayList<>();
+            String query = "SELECT * FROM Account WHERE accountNumber = ? AND password = ?";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, accountNumber);
+                preparedStatement.setString(2, password);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Account account = new Account();
+                    accounts.add(account);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return accounts;
+        }
+
+        public Account findById(Long accountId) {
+            String query = "SELECT * FROM Account WHERE accountId = ?";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setLong(1, accountId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    Account account = new Account();
+                    account.setAccountID(resultSet.getInt(ACCOUNTID_COLUMN));
+                    account.setAccountNumber(resultSet.getString(ACCOUNTNUMBER_COLUMN));
+                    account.setClientLastName(resultSet.getString(CLIENTLASTNAME_COLUMN));
+                    account.setClientFirstName(resultSet.getString(CLIENTFIRSTNAME_COLUMN));
+                    account.setPassword(resultSet.getString(PASSWORD_COLUMN));
+                    account.setClientDateOfBirth(resultSet.getDate(CLIENTDATEOFBIRTH_COLUMN));
+                    account.setMonthlyNetSalary(resultSet.getBigDecimal(MONTHLYNETSALARY_COLUMN));
+                    account.setCreationDate(resultSet.getTimestamp(CREATIONDATE_COLUMN));
+                    account.setModificationDate(resultSet.getTimestamp(MODIFICATIONDATE_COLUMN));
+                    account.setOverdraftEnabled(resultSet.getBoolean(OVERDRAFTENABLED_COLUMN));
+                    account.setOverdraftLimit(resultSet.getBigDecimal(OVERDRAFTLIMIT_COLUMN));
+                    account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
+                    account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
+                    account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
+                    account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
                     return account;
                 }
             } catch (SQLException e) {
@@ -197,59 +148,142 @@ public class AccountRepository {
             }
             return null;
         }
-    public Account saveOrUpdateAccount(Account account) {
-        String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
-                "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
-                "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON CONFLICT (clientLastName, clientFirstName, clientDateOfBirth) " +
-                "DO UPDATE SET " +
-                "accountNumber = EXCLUDED.accountNumber, " +
-                "password = EXCLUDED.password, " +
-                "monthlyNetSalary = EXCLUDED.monthlyNetSalary, " +
-                "modificationDate = EXCLUDED.modificationDate, " +
-                "overdraftEnabled = EXCLUDED.overdraftEnabled, " +
-                "overdraftLimit = EXCLUDED.overdraftLimit, " +
-                "interestRateInitial = EXCLUDED.interestRateInitial, " +
-                "interestRateSubsequent = EXCLUDED.interestRateSubsequent, " +
-                "maxOverdraftDays = EXCLUDED.maxOverdraftDays, " +
-                "balance = EXCLUDED.balance";
 
-        try (Connection connection = PostgresqlConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, account.getAccountNumber());
-            preparedStatement.setString(2, account.getClientLastName());
-            preparedStatement.setString(3, account.getClientFirstName());
-            preparedStatement.setString(4, account.getPassword());
-            if (account.getClientDateOfBirth() != null) {
-                preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
-            } else {
-                preparedStatement.setNull(5, Types.DATE);
+        public boolean deleteById(Long accountId) {
+            String query = "DELETE FROM Account WHERE accountId = ?";
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setLong(1, accountId);
+                int rowsAffected = preparedStatement.executeUpdate();
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
             }
-            preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
-            preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
-            preparedStatement.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
-            preparedStatement.setBoolean(9, account.isOverdraftEnabled());
-            preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
-            preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
-            preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
-            preparedStatement.setLong(13, account.getMaxOverdraftDays());
-            preparedStatement.setBigDecimal(14, account.getBalance());
+        }
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                ResultSet rs = preparedStatement.getGeneratedKeys();
-                if (rs.next()) {
-                    int accountId = rs.getInt(1);
-                    account.setAccountID(accountId);
-                    return account;
+            public Account update(Account account) {
+                String query = "UPDATE Account SET accountNumber = ?, clientLastName = ?, clientFirstName = ?, " +
+                        "password = ?, clientDateOfBirth = ?, monthlyNetSalary = ?, " +
+                        "modificationDate = ?, overdraftEnabled = ?, overdraftLimit = ?, " +
+                        "interestRateInitial = ?, interestRateSubsequent = ?, maxOverdraftDays = ? , balance = ? " +
+                        "WHERE accountId = ?";
+                try (Connection connection = PostgresqlConnection.getConnection();
+                     PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setString(1, account.getAccountNumber());
+                    preparedStatement.setString(2, account.getClientLastName());
+                    preparedStatement.setString(3, account.getClientFirstName());
+                    preparedStatement.setString(4, account.getPassword());
+                    if (account.getClientDateOfBirth() != null) {
+                        preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
+                    } else {
+                        preparedStatement.setNull(5, Types.DATE);
+                    }
+                    preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
+                    preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+                    preparedStatement.setBoolean(8, account.isOverdraftEnabled());
+                    preparedStatement.setBigDecimal(9, account.getOverdraftLimit());
+                    preparedStatement.setBigDecimal(10, account.getInterestRateInitial());
+                    preparedStatement.setBigDecimal(11, account.getInterestRateSubsequent());
+                    preparedStatement.setInt(12, account.getMaxOverdraftDays());
+                    preparedStatement.setLong(13, account.getAccountID());
+                    preparedStatement.setBigDecimal(14, account.getBalance());
+                    int rowsUpdated = preparedStatement.executeUpdate();
+                    if (rowsUpdated > 0) {
+                        return account;
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+                return null;
             }
-            return null;
+        public Account saveOrUpdateAccount(Account account) {
+            String query = "INSERT INTO Account (accountNumber, clientLastName, clientFirstName, password, " +
+                    "clientDateOfBirth, monthlyNetSalary, creationDate, modificationDate, overdraftEnabled, " +
+                    "overdraftLimit, interestRateInitial, interestRateSubsequent, maxOverdraftDays, balance) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "ON CONFLICT (clientLastName, clientFirstName, clientDateOfBirth) " +
+                    "DO UPDATE SET " +
+                    "accountNumber = EXCLUDED.accountNumber, " +
+                    "password = EXCLUDED.password, " +
+                    "monthlyNetSalary = EXCLUDED.monthlyNetSalary, " +
+                    "modificationDate = EXCLUDED.modificationDate, " +
+                    "overdraftEnabled = EXCLUDED.overdraftEnabled, " +
+                    "overdraftLimit = EXCLUDED.overdraftLimit, " +
+                    "interestRateInitial = EXCLUDED.interestRateInitial, " +
+                    "interestRateSubsequent = EXCLUDED.interestRateSubsequent, " +
+                    "maxOverdraftDays = EXCLUDED.maxOverdraftDays, " +
+                    "balance = EXCLUDED.balance";
+
+            try (Connection connection = PostgresqlConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, account.getAccountNumber());
+                preparedStatement.setString(2, account.getClientLastName());
+                preparedStatement.setString(3, account.getClientFirstName());
+                preparedStatement.setString(4, account.getPassword());
+                if (account.getClientDateOfBirth() != null) {
+                    preparedStatement.setDate(5, new java.sql.Date(account.getClientDateOfBirth().getTime()));
+                } else {
+                    preparedStatement.setNull(5, Types.DATE);
+                }
+                preparedStatement.setBigDecimal(6, account.getMonthlyNetSalary());
+                preparedStatement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+                preparedStatement.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
+                preparedStatement.setBoolean(9, account.isOverdraftEnabled());
+                preparedStatement.setBigDecimal(10, account.getOverdraftLimit());
+                preparedStatement.setBigDecimal(11, account.getInterestRateInitial());
+                preparedStatement.setBigDecimal(12, account.getInterestRateSubsequent());
+                preparedStatement.setLong(13, account.getMaxOverdraftDays());
+                preparedStatement.setBigDecimal(14, account.getBalance());
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    ResultSet rs = preparedStatement.getGeneratedKeys();
+                    if (rs.next()) {
+                        int accountId = rs.getInt(1);
+                        account.setAccountID(accountId);
+                        return account;
+                    }
+                }
+                return null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+    public List<Account> findByAccountNumber(String accountNumber) {
+        List<Account> accounts = new ArrayList<>();
+        String query = "SELECT * FROM Account WHERE accountNumber = ?";
+        try (Connection connection = PostgresqlConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, accountNumber);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Account account = new Account();
+                account.setAccountID(resultSet.getInt(ACCOUNTID_COLUMN));
+                account.setAccountNumber(resultSet.getString(ACCOUNTNUMBER_COLUMN));
+                account.setClientLastName(resultSet.getString(CLIENTLASTNAME_COLUMN));
+                account.setClientFirstName(resultSet.getString(CLIENTFIRSTNAME_COLUMN));
+                account.setPassword(resultSet.getString(PASSWORD_COLUMN));
+                account.setClientDateOfBirth(resultSet.getDate(CLIENTDATEOFBIRTH_COLUMN));
+                account.setMonthlyNetSalary(resultSet.getBigDecimal(MONTHLYNETSALARY_COLUMN));
+                account.setCreationDate(resultSet.getTimestamp(CREATIONDATE_COLUMN));
+                account.setModificationDate(resultSet.getTimestamp(MODIFICATIONDATE_COLUMN));
+                account.setOverdraftEnabled(resultSet.getBoolean(OVERDRAFTENABLED_COLUMN));
+                account.setOverdraftLimit(resultSet.getBigDecimal(OVERDRAFTLIMIT_COLUMN));
+                account.setInterestRateInitial(resultSet.getBigDecimal(INTERESTRATEINITIAL_COLUMN));
+                account.setInterestRateSubsequent(resultSet.getBigDecimal(INTERESTRATESUBSEQUENT_COLUMN));
+                account.setMaxOverdraftDays(resultSet.getInt(MAXOVERDRAFTDAYS_COLUMN));
+                account.setBalance(resultSet.getBigDecimal(BALANCE_COLUMN));
+                accounts.add(account);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return accounts;
     }
+
+
 
 }

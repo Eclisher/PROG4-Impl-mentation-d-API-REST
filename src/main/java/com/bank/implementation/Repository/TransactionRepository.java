@@ -26,25 +26,32 @@ public class TransactionRepository {
     private static final String TRANSACTION_ID_COLUMN = "transactionID";
     private static final String CATEGORY_ID_COLUMN ="categoryID" ;
 
-    public void createTransaction(LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, String status, Long accountId, Long categoryId) {
+    public void createTransaction(LocalDateTime transactionDateTime, BigDecimal amount, String transactionType, String reason, LocalDateTime effectDate, String status, Long accountId, Long categoryId) {
         String query = "INSERT INTO " + TRANSACTION_TABLE_NAME + " (" + TRANSACTION_DATETIME_COLUMN + ", " + AMOUNT_COLUMN + ", " +
                 TRANSACTION_TYPE_COLUMN + ", " + REASON_COLUMN + ", " + EFFECT_DATE_COLUMN + ", " + STATUS_COLUMN + ", " + ACCOUNT_ID_COLUMN + ", " + CATEGORY_ID_COLUMN + ") " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = PostgresqlConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(transactionDateTime));
-            preparedStatement.setDouble(2, amount);
+            preparedStatement.setBigDecimal(2, amount);
             preparedStatement.setString(3, transactionType);
             preparedStatement.setString(4, reason);
             preparedStatement.setTimestamp(5, Timestamp.valueOf(effectDate));
             preparedStatement.setString(6, status);
             preparedStatement.setLong(7, accountId);
-            preparedStatement.setLong(8, categoryId);
+
+            Long categoryIdValue = categoryId != null ? categoryId.longValue() : null;
+            if (categoryIdValue != null) {
+                preparedStatement.setLong(8, categoryIdValue);
+            } else {
+                preparedStatement.setNull(8, Types.BIGINT);
+            }
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
@@ -81,14 +88,15 @@ public class TransactionRepository {
     }
 
 
-    public void createDepositTransaction(double amount, String reason, LocalDateTime effectDate, Long accountId) {
+
+    public void createDepositTransaction(BigDecimal amount, String reason, LocalDateTime effectDate, Long accountId) {
         String query = "INSERT INTO " + TRANSACTION_TABLE_NAME + " (" + TRANSACTION_DATETIME_COLUMN + ", " + AMOUNT_COLUMN + ", " +
-                TRANSACTION_TYPE_COLUMN + ", " + REASON_COLUMN + ", " + EFFECT_DATE_COLUMN + ", " + STATUS_COLUMN + ", " + ACCOUNT_ID_COLUMN + ", " + TRANSACTION_ID_COLUMN +" ) " +
+                TRANSACTION_TYPE_COLUMN + ", " + REASON_COLUMN + ", " + EFFECT_DATE_COLUMN + ", " + STATUS_COLUMN + ", " + ACCOUNT_ID_COLUMN + ", " + TRANSACTION_ID_COLUMN + " ) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = PostgresqlConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-            preparedStatement.setDouble(2, amount);
+            preparedStatement.setBigDecimal(2, amount);
             preparedStatement.setString(3, "deposit");
             preparedStatement.setString(4, reason);
             preparedStatement.setTimestamp(5, Timestamp.valueOf(effectDate));
@@ -170,7 +178,7 @@ public class TransactionRepository {
         Transaction transaction = new Transaction();
         transaction.setTransactionId(resultSet.getLong(TRANSACTION_ID_COLUMN));
         transaction.setTransactionDateTime(resultSet.getTimestamp(TRANSACTION_DATETIME_COLUMN).toLocalDateTime());
-        transaction.setAmount(resultSet.getDouble(AMOUNT_COLUMN));
+        transaction.setAmount(resultSet.getBigDecimal(AMOUNT_COLUMN));
         transaction.setTransactionType(resultSet.getString(TRANSACTION_TYPE_COLUMN));
         transaction.setReason(resultSet.getString(REASON_COLUMN));
         transaction.setEffectDate(resultSet.getTimestamp(EFFECT_DATE_COLUMN).toLocalDateTime());

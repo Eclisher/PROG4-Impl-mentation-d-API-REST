@@ -72,6 +72,43 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Transfer Money",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/transaction/transfer?sourceAccountNumber=0324379179&targetAccountNumber=0324379180&amount=100",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "transaction",
+            "transfer"
+          ],
+          "query": [
+            {
+              "key": "sourceAccountNumber",
+              "value": "0324379179",
+              "description": ""
+            },
+            {
+              "key": "targetAccountNumber",
+              "value": "0324379180",
+              "description": ""
+            },
+            {
+              "key": "amount",
+              "value": "100",
+              "description": ""
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }

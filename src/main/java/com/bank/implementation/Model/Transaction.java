@@ -1,11 +1,12 @@
 package com.bank.implementation.Model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction {
     private Long transactionId;
     private LocalDateTime transactionDateTime;
-    private double amount;
+    private BigDecimal amount;
     private String transactionType;
     private String reason;
     private LocalDateTime effectDate;
@@ -13,7 +14,7 @@ public class Transaction {
     private String status;
     private Long accountId;
     private  Long categoryId;
-    public Transaction(Long transactionId, LocalDateTime transactionDateTime, double amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status, Long accountId, Long categoryId) {
+    public Transaction(Long transactionId, LocalDateTime transactionDateTime, BigDecimal amount, String transactionType, String reason, LocalDateTime effectDate, LocalDateTime registrationDate, String status, Long accountId, Long categoryId) {
         this.transactionId = transactionId;
         this.transactionDateTime = transactionDateTime;
         this.amount = amount;
@@ -64,11 +65,11 @@ public class Transaction {
         this.transactionDateTime = transactionDateTime;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
