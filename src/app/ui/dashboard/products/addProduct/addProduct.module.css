@@ -21,6 +21,29 @@
 
 .table {
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ffffff;
+  color: #ffffff;
+}
+
+.table th {
+  background-color: #046630bc;
+  text-transform: uppercase;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #0c5a2c;
+}
+
+.table tbody tr:hover {
+  background-color: #046630bc;
 }
 
 .form {
@@ -28,6 +51,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin-top: 20px;
 }
 
 .form input {

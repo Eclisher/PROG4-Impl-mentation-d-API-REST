@@ -22,7 +22,7 @@ export default function ConnexionPage() {
       return;
     }
     try {
-      const response = await axios.post('/api/sign-up', {
+      const response = await axios.post('http://localhost:8080/sign-up', {
         accountNumber,
         clientLastName,
         clientFirstName,
@@ -50,7 +50,7 @@ export default function ConnexionPage() {
     }
   
     try {
-      const response = await axios.post('/api/sign-in', {
+      const response = await axios.post('http://localhost:8080/sign-in', {
         accountNumber,
         password
       });

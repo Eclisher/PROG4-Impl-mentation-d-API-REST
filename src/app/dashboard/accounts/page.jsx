@@ -1,62 +1,47 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import styles from "@/app/ui/dashboard/products/addProduct/addProduct.module.css";
 
 const AccountForm = () => {
   const [accounts, setAccounts] = useState([]);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    salary: "",
-    accountNumber: "",
-  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/accounts");
+        setAccounts(response.data);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const today = new Date();
-    const birthDate = new Date(formData.birthDate);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    if (
-      today <
-      new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
-    ) {
-      age--;
-    }
-    if (age < 21) {
-      alert("Le client doit avoir plus de 21 ans.");
-      return;
-    }
-    setAccounts((prevState) => [...prevState, formData]);
-    setFormData({
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      salary: "",
-      accountNumber: "",
-    });
-  };
+    fetchAccounts();
+  }, []);
 
   return (
-    <div> 
+    <div>
       <div className={styles.container}>
         <h2 className={styles.title}>List of accounts</h2>
         <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Date of Birth</th>
+              <th>Monthly Net Salary</th>
+              <th>Balance</th>
+              <th>Account Number</th>
+            </tr>
+          </thead>
           <tbody>
             {accounts.map((account, index) => (
               <tr key={index}>
-                <td>{account.firstName}</td>
-                <td>{account.lastName}</td>
-                <td>{account.birthDate}</td>
-                <td>{account.salary}</td>
+                <td>{account.clientFirstName}</td>
+                <td>{account.clientLastName}</td>
+                <td>{account.clientDateOfBirth}</td>
+                <td>{account.monthlyNetSalary}</td>
+                <td>{account.balance}</td>
                 <td>{account.accountNumber}</td>
               </tr>
             ))}
